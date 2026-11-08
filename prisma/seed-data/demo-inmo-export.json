@@ -1,0 +1,793 @@
+{
+  "settings": [
+    {
+      "key": "store_footer_logo_url",
+      "value": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/branding/cca5a384-b17f-4247-8f36-1f2f540963d0.webp"
+    },
+    {
+      "key": "store_add_to_cart_label",
+      "value": "Agregar"
+    },
+    {
+      "key": "seo_title",
+      "value": "Horizonte · Propiedades en Córdoba"
+    },
+    {
+      "key": "about_text",
+      "value": "<p>Horizonte nació en Córdoba con una idea simple: comprar, vender o alquilar una propiedad no tiene por qué ser un dolor de cabeza. Desde hace más de una década acompañamos a familias e inversores en cada paso del camino, con información clara y sin sorpresas de último momento.</p><p>Hoy operamos en los barrios que más elegís: Nueva Córdoba, Cerro de las Rosas, Villa Belgrano, Alta Córdoba, Güemes, General Paz y Centro. Conocemos cada zona en detalle, lo que nos permite asesorarte con datos reales sobre precios, demanda y proyección a futuro.</p><p>Nuestro equipo combina experiencia inmobiliaria con herramientas digitales pensadas para que encuentres lo que buscás más rápido, ya sea para vivir, alquilar o invertir.</p>"
+    },
+    {
+      "key": "store_cover_url",
+      "value": "https://images.unsplash.com/photo-1758448500688-3ababa93fd67?w=1600&q=80&auto=format&fit=crop"
+    },
+    {
+      "key": "store_address",
+      "value": "Av. Colón 1234 — Córdoba, Argentina"
+    },
+    {
+      "key": "store_phone",
+      "value": "+54 351 555-0100"
+    },
+    {
+      "key": "store_city",
+      "value": "Córdoba"
+    },
+    {
+      "key": "store_header_bg_color",
+      "value": "#ffffff"
+    },
+    {
+      "key": "store_province",
+      "value": "Córdoba"
+    },
+    {
+      "key": "store_menu_bg_color",
+      "value": "#1c3054"
+    },
+    {
+      "key": "store_footer_bg_color",
+      "value": "#1c3054"
+    },
+    {
+      "key": "catalog_filters",
+      "value": "city,operation,propertyType,bedrooms"
+    },
+    {
+      "key": "store_button_color",
+      "value": "#51c2ec"
+    },
+    {
+      "key": "store_badge_color",
+      "value": "#51c2ec"
+    },
+    {
+      "key": "store_show_name_in_header",
+      "value": "false"
+    },
+    {
+      "key": "store_logo_height",
+      "value": "100"
+    },
+    {
+      "key": "store_footer_logo_height",
+      "value": "100"
+    },
+    {
+      "key": "ai_agent_enabled",
+      "value": "true"
+    },
+    {
+      "key": "store_favicon_url",
+      "value": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/branding/f1c77b76-0343-4eff-9e66-8d2aea844ff3.png"
+    },
+    {
+      "key": "store_logo_url",
+      "value": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/branding/fbc12cd3-6bed-4b4c-85de-097958c1037f.svg"
+    },
+    {
+      "key": "store_template",
+      "value": "clasico"
+    },
+    {
+      "key": "store_whatsapp",
+      "value": "+54 9 351 555-0100"
+    },
+    {
+      "key": "store_instagram",
+      "value": "@facu"
+    },
+    {
+      "key": "store_facebook",
+      "value": "@face"
+    },
+    {
+      "key": "store_youtube",
+      "value": "#asdf"
+    },
+    {
+      "key": "store_name",
+      "value": "Inmobiliaria demo"
+    }
+  ],
+  "aboutMedia": [
+    {
+      "id": "cmu5evenr0000ye3mi2cmbb3m",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "type": "IMAGE",
+      "url": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/about/59859633-6ebf-4d2c-9538-6a8dbd491765.webp",
+      "order": 0,
+      "createdAt": "2026-09-17T13:53:11.031Z"
+    },
+    {
+      "id": "cmu5evicf0001ye3mr1j526ac",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "type": "IMAGE",
+      "url": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/about/cc44c5d2-da57-403f-b56c-9be79c5a674b.webp",
+      "order": 1,
+      "createdAt": "2026-09-17T13:53:15.807Z"
+    }
+  ],
+  "properties": [
+    {
+      "id": "cmu35c3uo0005tl3m4mkad2xe",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "code": "HZ-001",
+      "title": "Casa con jardín en zona norte",
+      "description": "Propiedad ficticia de demostración. Ambientes cómodos, buena iluminación y excelente distribución. Los datos y precios son ilustrativos.",
+      "propertyType": "Casa",
+      "address": "Dirección privada ficticia 100",
+      "city": "Córdoba",
+      "neighborhood": "Cerro de las Rosas",
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "garages": 2,
+      "coveredArea": "160.00",
+      "totalArea": "350.00",
+      "published": true,
+      "featured": true,
+      "ownerId": "cmu35c3ub0002tl3mysym8ts3",
+      "developmentId": null,
+      "createdAt": "2026-09-15T23:50:41.664Z",
+      "updatedAt": "2026-09-16T21:10:34.982Z",
+      "latitude": "-31.3891000",
+      "longitude": "-64.2246000",
+      "featuredOrder": 0,
+      "videoUrl": null,
+      "orientation": null,
+      "petsPolicy": null,
+      "creditEligible": null,
+      "floorPlanUrl": null
+    },
+    {
+      "id": "cmu35c3uw0007tl3mnqknj287",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "code": "HZ-002",
+      "title": "Departamento luminoso con balcón",
+      "description": "Propiedad ficticia de demostración. Ambientes cómodos, buena iluminación y excelente distribución. Los datos y precios son ilustrativos.",
+      "propertyType": "Departamento",
+      "address": "Dirección privada ficticia 101",
+      "city": "Córdoba",
+      "neighborhood": "Nueva Córdoba",
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "garages": 1,
+      "coveredArea": "75.00",
+      "totalArea": "88.00",
+      "published": true,
+      "featured": false,
+      "ownerId": "cmu35c3ub0002tl3mysym8ts3",
+      "developmentId": null,
+      "createdAt": "2026-09-15T23:50:41.672Z",
+      "updatedAt": "2026-09-16T12:41:16.779Z",
+      "latitude": "-31.4257000",
+      "longitude": "-64.1888000",
+      "featuredOrder": 0,
+      "videoUrl": null,
+      "orientation": null,
+      "petsPolicy": null,
+      "creditEligible": null,
+      "floorPlanUrl": null
+    },
+    {
+      "id": "cmu35c3v0000atl3mft8f2ks7",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "code": "HZ-003",
+      "title": "Tu próximo hogar junto al parque",
+      "description": "Propiedad ficticia de demostración. Ambientes cómodos, buena iluminación y excelente distribución. Los datos y precios son ilustrativos.",
+      "propertyType": "Departamento",
+      "address": "Dirección privada ficticia 102",
+      "city": "Córdoba",
+      "neighborhood": "General Paz",
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "garages": 0,
+      "coveredArea": "48.00",
+      "totalArea": "56.00",
+      "published": true,
+      "featured": false,
+      "ownerId": "cmu35c3ub0002tl3mysym8ts3",
+      "developmentId": "cmu35c3uf0004tl3mnn2bf42u",
+      "createdAt": "2026-09-15T23:50:41.676Z",
+      "updatedAt": "2026-09-16T12:41:16.782Z",
+      "latitude": "-31.4189000",
+      "longitude": "-64.1755000",
+      "featuredOrder": 0,
+      "videoUrl": null,
+      "orientation": null,
+      "petsPolicy": null,
+      "creditEligible": null,
+      "floorPlanUrl": null
+    },
+    {
+      "id": "cmu3wc1nw0003ws3mxu1oqyib",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "code": "HZ-004",
+      "title": "Casa de campo con quincho y pileta",
+      "description": "Propiedad ficticia de demostración. Ambientes cómodos, buena iluminación y excelente distribución. Los datos y precios son ilustrativos.",
+      "propertyType": "Casa",
+      "address": "Dirección privada ficticia HZ-004",
+      "city": "Córdoba",
+      "neighborhood": "Villa Belgrano",
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "garages": 2,
+      "coveredArea": "240.00",
+      "totalArea": "600.00",
+      "published": true,
+      "featured": true,
+      "ownerId": "cmu35c3ub0002tl3mysym8ts3",
+      "developmentId": null,
+      "createdAt": "2026-09-16T12:26:28.460Z",
+      "updatedAt": "2026-09-16T21:10:34.983Z",
+      "latitude": "-31.3611000",
+      "longitude": "-64.2394000",
+      "featuredOrder": 1,
+      "videoUrl": null,
+      "orientation": null,
+      "petsPolicy": null,
+      "creditEligible": null,
+      "floorPlanUrl": null
+    },
+    {
+      "id": "cmu3wc1o50006ws3mtltqmzqm",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "code": "HZ-005",
+      "title": "PH a estrenar con patio propio",
+      "description": "Propiedad ficticia de demostración. Ambientes cómodos, buena iluminación y excelente distribución. Los datos y precios son ilustrativos.",
+      "propertyType": "Departamento",
+      "address": "Dirección privada ficticia HZ-005",
+      "city": "Córdoba",
+      "neighborhood": "Alta Córdoba",
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "garages": 0,
+      "coveredArea": "62.00",
+      "totalArea": "70.00",
+      "published": true,
+      "featured": false,
+      "ownerId": "cmu35c3ub0002tl3mysym8ts3",
+      "developmentId": null,
+      "createdAt": "2026-09-16T12:26:28.469Z",
+      "updatedAt": "2026-09-16T12:41:16.787Z",
+      "latitude": "-31.3903000",
+      "longitude": "-64.1815000",
+      "featuredOrder": 0,
+      "videoUrl": null,
+      "orientation": null,
+      "petsPolicy": null,
+      "creditEligible": null,
+      "floorPlanUrl": null
+    },
+    {
+      "id": "cmu3wc1oe0009ws3m8yqkhv5g",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "code": "HZ-006",
+      "title": "Local comercial sobre avenida",
+      "description": "Propiedad ficticia de demostración. Ambientes cómodos, buena iluminación y excelente distribución. Los datos y precios son ilustrativos.",
+      "propertyType": "Local",
+      "address": "Dirección privada ficticia HZ-006",
+      "city": "Córdoba",
+      "neighborhood": "Nueva Córdoba",
+      "bedrooms": 0,
+      "bathrooms": 1,
+      "garages": 0,
+      "coveredArea": "90.00",
+      "totalArea": "90.00",
+      "published": true,
+      "featured": false,
+      "ownerId": "cmu35c3ub0002tl3mysym8ts3",
+      "developmentId": null,
+      "createdAt": "2026-09-16T12:26:28.478Z",
+      "updatedAt": "2026-09-22T01:15:13.768Z",
+      "latitude": "-31.4270000",
+      "longitude": "-64.1870000",
+      "featuredOrder": 2,
+      "videoUrl": null,
+      "orientation": null,
+      "petsPolicy": null,
+      "creditEligible": null,
+      "floorPlanUrl": null
+    },
+    {
+      "id": "cmu3wc1ok000cws3mp0a6hh4t",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "code": "HZ-007",
+      "title": "Departamento con cochera en Güemes",
+      "description": "Propiedad ficticia de demostración. Ambientes cómodos, buena iluminación y excelente distribución. Los datos y precios son ilustrativos.",
+      "propertyType": "Departamento",
+      "address": "Dirección privada ficticia HZ-007",
+      "city": "Córdoba",
+      "neighborhood": "Güemes",
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "garages": 1,
+      "coveredArea": "95.00",
+      "totalArea": "100.00",
+      "published": true,
+      "featured": false,
+      "ownerId": "cmu35c3ub0002tl3mysym8ts3",
+      "developmentId": null,
+      "createdAt": "2026-09-16T12:26:28.484Z",
+      "updatedAt": "2026-09-22T01:15:00.816Z",
+      "latitude": "-31.4269000",
+      "longitude": "-64.1801000",
+      "featuredOrder": 2,
+      "videoUrl": null,
+      "orientation": null,
+      "petsPolicy": null,
+      "creditEligible": null,
+      "floorPlanUrl": null
+    },
+    {
+      "id": "cmu3wc1oq000gws3mry3eydef",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "code": "HZ-008",
+      "title": "Oficina luminosa en microcentro",
+      "description": "Propiedad ficticia de demostración. Ambientes cómodos, buena iluminación y excelente distribución. Los datos y precios son ilustrativos.",
+      "propertyType": "Oficina",
+      "address": "Dirección privada ficticia HZ-008",
+      "city": "Córdoba",
+      "neighborhood": "Centro",
+      "bedrooms": 0,
+      "bathrooms": 1,
+      "garages": 0,
+      "coveredArea": "55.00",
+      "totalArea": "55.00",
+      "published": true,
+      "featured": false,
+      "ownerId": "cmu35c3ub0002tl3mysym8ts3",
+      "developmentId": null,
+      "createdAt": "2026-09-16T12:26:28.490Z",
+      "updatedAt": "2026-09-22T01:14:59.677Z",
+      "latitude": "-31.4173000",
+      "longitude": "-64.1833000",
+      "featuredOrder": 3,
+      "videoUrl": null,
+      "orientation": null,
+      "petsPolicy": null,
+      "creditEligible": null,
+      "floorPlanUrl": null
+    }
+  ],
+  "listings": [
+    {
+      "id": "cmu35c3uq0006tl3mumntwwnm",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu35c3uo0005tl3m4mkad2xe",
+      "operation": "SALE",
+      "currency": "USD",
+      "price": "185000.00",
+      "status": "AVAILABLE",
+      "temporary": false,
+      "whatsapp": null,
+      "showPrice": true
+    },
+    {
+      "id": "cmu35c3uy0008tl3mzimfkkki",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu35c3uw0007tl3mnqknj287",
+      "operation": "SALE",
+      "currency": "USD",
+      "price": "98000.00",
+      "status": "AVAILABLE",
+      "temporary": false,
+      "whatsapp": null,
+      "showPrice": true
+    },
+    {
+      "id": "cmu35c3uy0009tl3my9abscvz",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu35c3uw0007tl3mnqknj287",
+      "operation": "RENT",
+      "currency": "ARS",
+      "price": "780000.00",
+      "status": "AVAILABLE",
+      "temporary": false,
+      "whatsapp": null,
+      "showPrice": true
+    },
+    {
+      "id": "cmu35c3v1000btl3myp3nxnxy",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu35c3v0000atl3mft8f2ks7",
+      "operation": "SALE",
+      "currency": "USD",
+      "price": "69000.00",
+      "status": "AVAILABLE",
+      "temporary": false,
+      "whatsapp": null,
+      "showPrice": true
+    },
+    {
+      "id": "cmu3wc1o80008ws3mfj0u12b3",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1o50006ws3mtltqmzqm",
+      "operation": "RENT",
+      "currency": "ARS",
+      "price": "420000.00",
+      "status": "AVAILABLE",
+      "temporary": false,
+      "whatsapp": null,
+      "showPrice": true
+    },
+    {
+      "id": "cmu3wc1oh000bws3mt1nm4l1o",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1oe0009ws3m8yqkhv5g",
+      "operation": "RENT",
+      "currency": "ARS",
+      "price": "650000.00",
+      "status": "AVAILABLE",
+      "temporary": false,
+      "whatsapp": null,
+      "showPrice": true
+    },
+    {
+      "id": "cmu3wc1on000ews3mzf1vj3n1",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1ok000cws3mp0a6hh4t",
+      "operation": "SALE",
+      "currency": "USD",
+      "price": "135000.00",
+      "status": "AVAILABLE",
+      "temporary": false,
+      "whatsapp": null,
+      "showPrice": true
+    },
+    {
+      "id": "cmu3wc1oo000fws3m6916j5vl",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1ok000cws3mp0a6hh4t",
+      "operation": "RENT",
+      "currency": "ARS",
+      "price": "520000.00",
+      "status": "AVAILABLE",
+      "temporary": false,
+      "whatsapp": null,
+      "showPrice": true
+    },
+    {
+      "id": "cmu3wc1ot000iws3mpv28copw",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1oq000gws3mry3eydef",
+      "operation": "SALE",
+      "currency": "USD",
+      "price": "78000.00",
+      "status": "AVAILABLE",
+      "temporary": false,
+      "whatsapp": "3425256898",
+      "showPrice": true
+    },
+    {
+      "id": "cmu3wc1o10005ws3mvoa9db1k",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1nw0003ws3mxu1oqyib",
+      "operation": "SALE",
+      "currency": "USD",
+      "price": "320000.00",
+      "status": "AVAILABLE",
+      "temporary": false,
+      "whatsapp": null,
+      "showPrice": true
+    }
+  ],
+  "media": [
+    {
+      "id": "cmu3wc1np0000ws3mrvkouc3y",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu35c3uo0005tl3m4mkad2xe",
+      "url": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&q=75&auto=format&fit=crop",
+      "position": 0
+    },
+    {
+      "id": "cmu3wc1nr0001ws3m6gkfg0p5",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu35c3uw0007tl3mnqknj287",
+      "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=75&auto=format&fit=crop",
+      "position": 0
+    },
+    {
+      "id": "cmu3wc1ns0002ws3mqaucvlqb",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu35c3v0000atl3mft8f2ks7",
+      "url": "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&q=75&auto=format&fit=crop",
+      "position": 0
+    },
+    {
+      "id": "cmu3wc1nz0004ws3mc0aqas5x",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1nw0003ws3mxu1oqyib",
+      "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=75&auto=format&fit=crop",
+      "position": 0
+    },
+    {
+      "id": "cmu3wc1o70007ws3mrdjwb0dk",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1o50006ws3mtltqmzqm",
+      "url": "https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=1200&q=75&auto=format&fit=crop",
+      "position": 0
+    },
+    {
+      "id": "cmu3wc1og000aws3mmppoq2mq",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1oe0009ws3m8yqkhv5g",
+      "url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1200&q=75&auto=format&fit=crop",
+      "position": 0
+    },
+    {
+      "id": "cmu3wc1ol000dws3m1c0jci8c",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1ok000cws3mp0a6hh4t",
+      "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=75&auto=format&fit=crop",
+      "position": 0
+    },
+    {
+      "id": "cmu4mzeds0001an3mg930zdbc",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1oq000gws3mry3eydef",
+      "url": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/cmu35c3ty0000tl3mk0ku9171/properties/e757802a-a2db-4faf-a8c2-71386af05ca1.jpg",
+      "position": 0
+    },
+    {
+      "id": "cmu4mzeds0002an3ml4qc617y",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1oq000gws3mry3eydef",
+      "url": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/cmu35c3ty0000tl3mk0ku9171/properties/ae4c1f0d-91df-4536-85d8-e45cb998da28.png",
+      "position": 1
+    },
+    {
+      "id": "cmu3wc1or000hws3misyqqjig",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "propertyId": "cmu3wc1oq000gws3mry3eydef",
+      "url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=75&auto=format&fit=crop",
+      "position": 2
+    }
+  ],
+  "developments": [
+    {
+      "id": "cmu35c3uf0004tl3mnn2bf42u",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Patios del Parque",
+      "address": "Dirección ficticia 200",
+      "city": "Córdoba",
+      "stage": "CONSTRUCTION",
+      "description": "Proyecto de demostración con espacios verdes y unidades amplias.",
+      "createdAt": "2026-09-15T23:50:41.655Z",
+      "developer": "",
+      "progress": null,
+      "estimatedDelivery": null,
+      "descriptionColumns": false,
+      "amenities": [],
+      "financing": "",
+      "videoUrl": "https://www.youtube.com/watch?v=YFE2QphQUKs",
+      "formTitle": "Consultá por este emprendimiento",
+      "submitLabel": "Enviar consulta",
+      "published": true,
+      "updatedAt": "2026-09-18T13:39:51.133Z",
+      "latitude": "-31.6462510",
+      "longitude": "-60.7064227"
+    }
+  ],
+  "developmentImages": [
+    {
+      "id": "cmu6ti0zi000ub23mcrnmgtix",
+      "developmentId": "cmu35c3uf0004tl3mnn2bf42u",
+      "url": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/developments/61ff1bf6-ca15-46a0-91c9-a609fc65b685.webp",
+      "order": 0
+    },
+    {
+      "id": "cmu6ti0zi000vb23m75iu3bf7",
+      "developmentId": "cmu35c3uf0004tl3mnn2bf42u",
+      "url": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/developments/b831b974-323a-44b0-9f39-ce7533ea3a90.webp",
+      "order": 1
+    },
+    {
+      "id": "cmu6ti0zi000wb23mwdmqmlym",
+      "developmentId": "cmu35c3uf0004tl3mnn2bf42u",
+      "url": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/developments/92ea275e-dd71-44e1-91ed-deab3b95db8a.webp",
+      "order": 2
+    },
+    {
+      "id": "cmu6ti0zi000xb23mn1pe43wf",
+      "developmentId": "cmu35c3uf0004tl3mnn2bf42u",
+      "url": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/developments/adbb0a31-5f7b-4176-9c9c-0833cad35e05.webp",
+      "order": 3
+    },
+    {
+      "id": "cmu6ti0zi000yb23m4ysznfzp",
+      "developmentId": "cmu35c3uf0004tl3mnn2bf42u",
+      "url": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/developments/d8506080-ace0-4676-8754-bb0198e885d8.webp",
+      "order": 4
+    },
+    {
+      "id": "cmu6ti0zi000zb23mzqfvanvy",
+      "developmentId": "cmu35c3uf0004tl3mnn2bf42u",
+      "url": "https://pub-5622ff68fed3445a96d060a88000cedf.r2.dev/developments/ce087116-42ac-41ef-b752-6e5a86847950.webp",
+      "order": 5
+    }
+  ],
+  "contacts": [
+    {
+      "id": "cmu35c3ub0002tl3mysym8ts3",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "María López (demo)",
+      "email": "maria@example.test",
+      "phone": null,
+      "roles": [
+        "OWNER"
+      ],
+      "notes": "",
+      "archived": false,
+      "createdAt": "2026-09-15T23:50:41.651Z",
+      "updatedAt": "2026-09-15T23:50:41.651Z",
+      "taxId": null,
+      "address": null,
+      "birthDate": null,
+      "occupation": null,
+      "portalEnabled": false,
+      "ownerPortalEnabled": false
+    }
+  ],
+  "propertyTypes": [
+    {
+      "id": "1c50fe2b-1a53-420a-93c3-98021a46a20a",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Casa",
+      "order": 0
+    },
+    {
+      "id": "f65b4999-4d5b-4aae-aabb-61d8673209f5",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Departamento",
+      "order": 1
+    },
+    {
+      "id": "4f47a1fc-ef9b-4873-a497-d427b022d067",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Terreno",
+      "order": 2
+    },
+    {
+      "id": "e395ab56-47d9-4132-a3e2-060c313ddbbe",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Local",
+      "order": 3
+    },
+    {
+      "id": "7cc9b172-57be-41b0-8a31-9da03bc96199",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Oficina",
+      "order": 4
+    },
+    {
+      "id": "8fdea819-d58f-4cd8-9bab-abaf168831ef",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Galpón",
+      "order": 5
+    },
+    {
+      "id": "799be574-a764-49a3-a07a-af8e68dcf27c",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Campo",
+      "order": 6
+    },
+    {
+      "id": "bd4ccdfc-daad-4445-a640-5b7f655dc86a",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Cochera",
+      "order": 7
+    }
+  ],
+  "cities": [
+    {
+      "id": "4a19a081-2a8a-408c-b9ec-265fbcbc716e",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Córdoba",
+      "order": 5
+    },
+    {
+      "id": "cmu4o4mi700004q3mxof349fj",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Santa Fe",
+      "order": 6
+    }
+  ],
+  "neighborhoods": [
+    {
+      "id": "1f98e1dc-a0c9-4773-9e55-07612e89a640",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Alta Córdoba",
+      "order": 0
+    },
+    {
+      "id": "74ba7501-e151-4295-a695-8330371fac8d",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Centro",
+      "order": 1
+    },
+    {
+      "id": "5c8abcc6-f6a5-4ded-80fa-9df0e3d7d857",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Cerro de las Rosas",
+      "order": 2
+    },
+    {
+      "id": "61dcfc03-9430-4185-9911-20af972f2bcb",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "General Paz",
+      "order": 3
+    },
+    {
+      "id": "c59cc326-4800-4ef8-b831-bedd4487cf20",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Güemes",
+      "order": 4
+    },
+    {
+      "id": "fa90b84e-c058-4e64-a103-8ca12dbec3d3",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Nueva Córdoba",
+      "order": 6
+    },
+    {
+      "id": "1fec7c94-cc0e-4b08-b7fc-bfa8c339f704",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Villa Belgrano",
+      "order": 7
+    }
+  ],
+  "contractTypes": [
+    {
+      "id": "cmu5hm6fb0006ye3mcs8pinr9",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Residencial",
+      "order": 0
+    },
+    {
+      "id": "cmu5hm9p80007ye3mtk6pijij",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Comercial",
+      "order": 1
+    }
+  ],
+  "propertyDestinations": [
+    {
+      "id": "cmu5hmfqh0008ye3msaqp2xd0",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Vivienda",
+      "order": 0
+    },
+    {
+      "id": "cmu5hmlpk0009ye3m1v1zj6lq",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Comercio",
+      "order": 1
+    },
+    {
+      "id": "cmu5hms5v000aye3m4vg6xx1y",
+      "tenantId": "cmu35c3ty0000tl3mk0ku9171",
+      "name": "Depósito",
+      "order": 2
+    }
+  ]
+}

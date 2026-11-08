@@ -1,0 +1,1167 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------- Tenant ----------
+
+// Gerreli es un cliente puntual, no un SaaS multi-tenant — queda un solo
+// Tenant (una fila) como ancla de las relaciones Estate*/Settings/etc.,
+// sin ninguno de los campos que solo tenían sentido para resolver y
+// facturar muchas inmobiliarias distintas (ver PLAN_FORK.md).
+model Tenant {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  deals                  EstateDeal[]
+  valuations             EstateValuation[]
+  contacts               EstateContact[]
+  properties             EstateProperty[]
+  priceAlerts            EstatePriceAlert[]
+  qrVisits               EstateQrVisit[]
+  developments           EstateDevelopment[]
+  developmentCategories  EstateDevelopmentCategory[]
+  developmentInquiries   EstateDevelopmentInquiry[]
+  inquiries              EstateInquiry[]
+  visits                 EstateVisit[]
+  contracts              EstateContract[]
+  charges                EstateCharge[]
+  receipts               EstateReceipt[]
+  maintenance            EstateMaintenance[]
+  buildings              EstateBuilding[]
+  auditEvents            EstateAuditEvent[]
+  propertyFavorites      EstatePropertyFavorite[]
+  estatePageViews        EstatePageView[]
+  propertyTypes          EstatePropertyType[]
+  cities                 EstateCity[]
+  neighborhoods          EstateNeighborhood[]
+  contractTypes          EstateContractType[]
+  propertyDestinations   EstatePropertyDestination[]
+  agents                 EstateAgent[]
+  contractDocuments      EstateContractDocument[]
+  contractHandoverPhotos EstateContractHandoverPhoto[]
+  contractGuarantors     EstateContractGuarantor[]
+  contractChargeConcepts EstateContractChargeConcept[]
+  rentIndexValues        EstateRentIndexValue[]
+  billingSuggestions     EstateBillingSuggestion[]
+  users                  User[]
+
+  settings        Settings[]
+  aboutMedia      AboutMedia[]
+  emailLogs       EmailLog[]
+  whatsappLogs    WhatsappLog[]
+  aiConversations EstateAiConversation[]
+  mlLocations     EstateMlLocation[]
+  emailSubscribers EmailSubscriber[]
+  emailCampaigns   EmailCampaign[]
+}
+
+// ---------- Auth ----------
+
+enum Role {
+  AGENT
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  estateAgent   EstateAgent?
+  id            String    @id @default(cuid())
+  tenantId      String?
+  name          String?
+  email         String
+  emailVerified DateTime?
+  image         String?
+  phone         String?
+  address       String?
+  passwordHash  String?
+  role          Role      @default(CUSTOMER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id])
+
+  accounts           Account[]
+  sessions           Session[]
+  whatsappLogs       WhatsappLog[]
+  favoriteProperties EstatePropertyFavorite[]
+
+  // Portal del inquilino (Etapa 2) — un User con contactId es un inquilino
+  // con acceso a /mi-alquiler, no un admin ni un cliente de la tienda. Se
+  // crea por auto-registro (email + DNI cruzados contra EstateContact, ver
+  // activatePortalAccount) una vez que la inmobiliaria habilitó el contacto
+  // (EstateContact.portalEnabled). FK simple sin compuesta con tenantId,
+  // mismo criterio que `tenant` arriba — el chequeo de que el contacto sea
+  // del mismo tenant se hace en la acción, no en la base.
+  contactId     String?        @unique
+  estateContact EstateContact? @relation(fields: [contactId], references: [id])
+
+  @@unique([tenantId, email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  // Copiado del User al vincular la cuenta — permite que la misma cuenta de
+  // Google se vincule a un usuario distinto por cada tienda (tenant), en vez
+  // de compartir un solo User global entre tiendas distintas.
+  tenantId          String?
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Una fila por intento fallido de una acción sensible (login, registro,
+// recuperar contraseña). Se cuentan los de una misma `key` dentro de una
+// ventana de tiempo para frenar fuerza bruta. Va en la base y no en memoria
+// a propósito: sobrevive reinicios y sirve aunque corran varios procesos
+// de Next detrás de Nginx. Ver lib/rate-limit.ts.
+model RateLimitAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+// ---------- Campos a medida (emprendimientos) ----------
+
+enum ServiceFieldType {
+  TEXT
+  TEXTAREA
+  EMAIL
+  PHONE
+  NUMBER
+  DATE
+  SELECT
+}
+
+enum ServiceInquiryStatus {
+  NEW
+  IN_PROGRESS
+  QUOTED
+  RESPONDED
+  ACCEPTED
+  REJECTED
+  CLOSED
+}
+
+// ---------- Config general ----------
+
+model Settings {
+  tenantId String
+  key      String
+  value    String
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@id([tenantId, key])
+}
+
+// Historial de cada mail que la app intentó mandar (confirmación de
+// pedido, recuperación de contraseña, pruebas desde el admin) — para poder
+// ver desde el panel si efectivamente salieron, sin depender del proveedor
+// SMTP externo.
+model EmailLog {
+  id        String   @id @default(cuid())
+  tenantId  String
+  to        String
+  subject   String
+  type      String
+  success   Boolean
+  error     String?
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, createdAt])
+}
+
+// Queda registrado cada vez que un admin le manda un WhatsApp a un cliente
+// desde una campaña — no hay forma de confirmar que WhatsApp lo entregó (el
+// envío pasa por WhatsApp Web, fuera de la app), esto solo marca que el
+// admin abrió el link con el mensaje.
+model WhatsappLog {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  phone     String
+  message   String
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([userId, createdAt])
+}
+
+// ---------- Sobre nosotros ----------
+
+enum AboutMediaType {
+  IMAGE
+  VIDEO
+}
+
+model AboutMedia {
+  id        String         @id @default(cuid())
+  tenantId  String
+  type      AboutMediaType
+  url       String
+  order     Int            @default(0)
+  createdAt DateTime       @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+}
+
+// Inmobiliaria: tablas aditivas; el historial comercial anterior se conserva.
+model EstateContact {
+  id              String                    @id @default(cuid())
+  tenantId        String
+  name            String
+  email           String?
+  phone           String?
+  taxId           String?
+  address         String?
+  birthDate       DateTime?
+  occupation      String?
+  // Portal del inquilino (Etapa 2) — habilitación deliberada de la
+  // inmobiliaria, distinta de tener el rol TENANT. Sin esto en true, el
+  // auto-registro por email + DNI no encuentra el contacto aunque coincidan.
+  portalEnabled      Boolean                   @default(false)
+  // Portal del propietario — mismo criterio que portalEnabled pero para
+  // propietarios. Sin esto en true, el auto-registro por email + DNI no
+  // da acceso aunque el contacto exista como dueño de una propiedad.
+  ownerPortalEnabled Boolean                   @default(false)
+  roles           String[]                  @default([])
+  notes           String                    @default("")
+  archived        Boolean                   @default(false)
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  tenant          Tenant                    @relation(fields: [tenantId], references: [id])
+  deals           EstateDeal[]
+  valuations      EstateValuation[]
+  ownedProperties EstateProperty[]
+  inquiries       EstateInquiry[]
+  visits          EstateVisit[]
+  contracts       EstateContract[]
+  guarantorOf     EstateContractGuarantor[]
+  portalUser      User?
+
+  @@unique([id, tenantId])
+  @@index([tenantId, name])
+}
+
+// Empleados de la inmobiliaria (vendedores), NO clientes — se eligen desde
+// la propiedad como contacto de WhatsApp de cada oferta (venta/alquiler).
+// Entidad separada de EstateContact a propósito: mezclarlos confundiría el
+// listado de clientes con la nómina de personal.
+model EstateAgent {
+  userId            String?         @unique
+  accessEnabled     Boolean         @default(false)
+  // Alcances del panel del agente. Se guarda como JSON para poder agregar
+  // nuevas secciones sin alterar las cuentas existentes.
+  permissions       Json            @default("{}")
+  user              User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  assignedInquiries EstateInquiry[]
+  id                String          @id @default(cuid())
+  tenantId          String
+  name              String
+  email             String?
+  phone             String
+  createdAt         DateTime        @default(now())
+  tenant            Tenant          @relation(fields: [tenantId], references: [id])
+
+  @@unique([id, tenantId])
+  @@index([tenantId, name])
+}
+
+model EstateDevelopment {
+  id                 String                     @id @default(cuid())
+  tenantId           String
+  name               String
+  address            String
+  city               String
+  latitude           Decimal?                   @db.Decimal(10, 7)
+  longitude          Decimal?                   @db.Decimal(10, 7)
+  developer          String                     @default("")
+  stage              String                     @default("PROJECT")
+  progress           Int?
+  estimatedDelivery  String?
+  description        String                     @default("")
+  descriptionColumns Boolean                    @default(false)
+  amenities          String[]                   @default([])
+  financing          String                     @default("")
+  videoUrl           String?
+  formTitle          String                     @default("Consultá por este emprendimiento")
+  submitLabel        String                     @default("Enviar consulta")
+  published          Boolean                    @default(false)
+  // Categoría de obra (Viviendas, Edificios…), editable desde el panel.
+  // FK simple por id (no compuesta con tenantId) para que SetNull no
+  // intente anular tenantId al borrar la categoría; el tenant se valida
+  // en saveDevelopment.
+  categoryId         String?
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  tenant             Tenant                     @relation(fields: [tenantId], references: [id])
+  category           EstateDevelopmentCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  properties         EstateProperty[]
+  fields             EstateDevelopmentField[]
+  images             EstateDevelopmentImage[]
+  inquiries          EstateDevelopmentInquiry[]
+
+  @@unique([id, tenantId])
+  @@index([tenantId, published, createdAt])
+  @@index([categoryId])
+}
+
+// Categorías de obras (EstateDevelopment se muestra como "Obras" en el sitio).
+model EstateDevelopmentCategory {
+  id           String              @id @default(cuid())
+  tenantId     String
+  name         String
+  order        Int                 @default(0)
+  tenant       Tenant              @relation(fields: [tenantId], references: [id])
+  developments EstateDevelopment[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model EstateDevelopmentField {
+  id            String            @id @default(cuid())
+  developmentId String
+  label         String
+  type          ServiceFieldType  @default(TEXT)
+  required      Boolean           @default(false)
+  options       String[]          @default([])
+  order         Int               @default(0)
+  development   EstateDevelopment @relation(fields: [developmentId], references: [id], onDelete: Cascade)
+
+  @@index([developmentId, order])
+}
+
+model EstateDevelopmentImage {
+  id            String            @id @default(cuid())
+  developmentId String
+  url           String
+  order         Int               @default(0)
+  development   EstateDevelopment @relation(fields: [developmentId], references: [id], onDelete: Cascade)
+
+  @@index([developmentId, order])
+}
+
+model EstateDevelopmentInquiry {
+  id                String                          @id @default(cuid())
+  tenantId          String
+  developmentId     String?
+  developmentName   String
+  answers           Json
+  status            ServiceInquiryStatus            @default(NEW)
+  internalNotes     String?
+  telegramSent      Boolean                         @default(false)
+  emailSent         Boolean                         @default(false)
+  notificationError String?
+  createdAt         DateTime                        @default(now())
+  updatedAt         DateTime                        @updatedAt
+  tenant            Tenant                          @relation(fields: [tenantId], references: [id])
+  development       EstateDevelopment?              @relation(fields: [developmentId], references: [id], onDelete: SetNull)
+  events            EstateDevelopmentInquiryEvent[]
+
+  @@unique([id, tenantId])
+  @@index([tenantId, status, createdAt])
+  @@index([developmentId])
+}
+
+model EstateDevelopmentInquiryEvent {
+  id        String                   @id @default(cuid())
+  inquiryId String
+  status    ServiceInquiryStatus
+  notes     String?
+  createdAt DateTime                 @default(now())
+  inquiry   EstateDevelopmentInquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+
+  @@index([inquiryId, createdAt])
+}
+
+model EstateProperty {
+  id             String                   @id @default(cuid())
+  tenantId       String
+  code           String
+  title          String
+  description    String                   @default("")
+  // Link externo (YouTube, Vimeo, Google Drive, Dropbox, etc.) — se
+  // interpreta y embebe en /propiedades/[id], no se sube el video al
+  // servidor. Ver src/lib/estate/video-embed.ts.
+  videoUrl       String?
+  orientation    String?
+  petsPolicy     String?
+  creditEligible Boolean?
+  floorPlanUrl   String?
+  // Título y descripción para Google: vacíos = se arman solos con tipo,
+  // operación, barrio y precio (ver src/lib/seo.ts).
+  seoTitle       String                   @default("")
+  seoDescription String                   @default("")
+  propertyType   String
+  address        String
+  city           String
+  neighborhood   String                   @default("")
+  bedrooms       Int                      @default(0)
+  bathrooms      Int                      @default(0)
+  garages        Int                      @default(0)
+  coveredArea    Decimal?                 @db.Decimal(12, 2)
+  totalArea      Decimal?                 @db.Decimal(12, 2)
+  // Para el pin en /mapa, elegido a mano en el buscador de dirección del
+  // admin (Nominatim/OpenStreetMap). mapAddress guarda el texto resuelto en
+  // ese momento, para mostrarlo después sin depender de una geocodificación
+  // inversa (que puede devolver algo más genérico, p.ej. solo la ciudad).
+  latitude       Decimal?                 @db.Decimal(10, 7)
+  longitude      Decimal?                 @db.Decimal(10, 7)
+  mapAddress     String?
+  published      Boolean                  @default(false)
+  featured       Boolean                  @default(false)
+  // Orden manual entre las destacadas (menor = primero) — ver
+  // reorderFeaturedEstateProperties en admin/gestion/actions.ts. Sin efecto
+  // en las que no están destacadas.
+  featuredOrder  Int                      @default(0)
+  ownerId        String?
+  developmentId  String?
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  tenant         Tenant                   @relation(fields: [tenantId], references: [id])
+  owner          EstateContact?           @relation(fields: [ownerId, tenantId], references: [id, tenantId])
+  development    EstateDevelopment?       @relation(fields: [developmentId, tenantId], references: [id, tenantId])
+  deals          EstateDeal[]
+  listings       EstateListing[]
+  media          EstateMedia[]
+  inquiries      EstateInquiry[]
+  visits         EstateVisit[]
+  contracts      EstateContract[]
+  maintenance    EstateMaintenance[]
+  favorites      EstatePropertyFavorite[]
+  pageViews      EstatePageView[]
+  priceAlerts    EstatePriceAlert[]
+  qrVisits       EstateQrVisit[]
+
+  @@unique([id, tenantId])
+  @@unique([tenantId, code])
+  @@index([tenantId, published, city])
+}
+
+// «Avisarme si baja el precio». No se guarda si "ya bajó": se compara
+// baselinePrice contra el precio actual de la oferta al leer la lista, así
+// cuenta cualquier camino por el que cambie el precio. Al avisarle a la
+// persona, baselinePrice pasa a ser el precio actual.
+model EstatePriceAlert {
+  id            String         @id @default(cuid())
+  tenantId      String
+  propertyId    String
+  operation     String
+  currency      String
+  baselinePrice Decimal        @db.Decimal(16, 2)
+  name          String
+  phone         String
+  email         String
+  notifiedAt    DateTime?
+  createdAt     DateTime       @default(now())
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property      EstateProperty @relation(fields: [propertyId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@unique([propertyId, operation, email])
+  @@index([tenantId, createdAt])
+}
+
+// Una persona entró a una propiedad escaneando su QR (ver /qr/[id]).
+model EstateQrVisit {
+  id         String         @id @default(cuid())
+  tenantId   String
+  propertyId String
+  firstName  String
+  lastName   String
+  phone      String
+  handledAt  DateTime?
+  createdAt  DateTime       @default(now())
+  tenant     Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property   EstateProperty @relation(fields: [propertyId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@index([tenantId, handledAt])
+  @@index([tenantId, createdAt])
+  @@index([propertyId])
+}
+
+// Navegación anónima del sitio público. visitorId es una cookie aleatoria
+// por host; no identifica a una persona.
+model EstatePageView {
+  id         String          @id @default(cuid())
+  tenantId   String
+  propertyId String?
+  path       String
+  visitorId  String?
+  referrer   String?
+  userAgent  String?
+  createdAt  DateTime        @default(now())
+  tenant     Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property   EstateProperty? @relation(fields: [propertyId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, propertyId, createdAt])
+  @@index([tenantId, path, createdAt])
+}
+
+// Propiedades que un cliente logueado del sitio público marcó con el
+// corazón — separado de EstateContact/EstateInquiry porque no implica
+// ninguna interacción comercial todavía, solo una lista personal.
+model EstatePropertyFavorite {
+  id         String         @id @default(cuid())
+  tenantId   String
+  userId     String
+  propertyId String
+  createdAt  DateTime       @default(now())
+  tenant     Tenant         @relation(fields: [tenantId], references: [id])
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property   EstateProperty @relation(fields: [propertyId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([tenantId, userId])
+}
+
+model EstateListing {
+  id         String         @id @default(cuid())
+  tenantId   String
+  propertyId String
+  operation  String
+  currency   String         @default("USD")
+  price      Decimal?       @db.Decimal(16, 2)
+  // Alquiler temporario (por día) en vez de alquiler mensual — solo tiene
+  // sentido con operation = "RENT"; ver PropertyOfferPriceFields en el admin.
+  temporary  Boolean        @default(false)
+  // Número de WhatsApp para consultas de ESTA oferta puntual (venta o
+  // alquiler pueden ir a un vendedor distinto). Si es null, el frontend no
+  // muestra botón de WhatsApp para esa oferta.
+  whatsapp   String?
+  // El precio se guarda siempre (sirve para estadísticas internas, p.ej.
+  // cuánto se factura por mes en alquileres) aunque el sitio público no lo
+  // muestre — ahí cuando es false se ve "Consultar precio" en su lugar.
+  showPrice  Boolean        @default(true)
+  status     String         @default("AVAILABLE")
+  property   EstateProperty @relation(fields: [propertyId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  // ---- Sincronización con Mercado Libre (un item de ML = una oferta) ----
+  // null = nunca se publicó. mlStatus refleja el status que devuelve ML
+  // (active | paused | closed), no el status comercial de arriba.
+  mlItemId       String?
+  mlPermalink    String?
+  mlCategoryId   String?
+  mlListingTypeId String?  @default("silver")
+  mlStatus       String?
+  mlLastSyncedAt DateTime?
+  mlLastError    String?
+  // Valores de atributos que ML pide y no salen de la propiedad (ej.
+  // LAND_ACCESS de un terreno): { "LAND_ACCESS": "245046" } — value_id si
+  // el atributo es de lista, texto si no. Se completan desde la ficha.
+  mlAttributes   Json?
+
+  @@unique([propertyId, operation])
+  @@index([tenantId, status])
+  @@index([mlItemId])
+}
+
+// Mapeo manual (una vez por ciudad/barrio) entre el texto libre que usa
+// EstateProperty.city/neighborhood y el ID de ubicación de Mercado Libre
+// (classified_locations) — ML exige ese ID para publicar, no acepta texto
+// libre. Se resuelve a mano desde /admin/configuracion → Mercado Libre y
+// se reutiliza para todas las propiedades de esa ciudad/barrio.
+model EstateMlLocation {
+  id              String   @id @default(cuid())
+  tenantId        String
+  city            String
+  neighborhood    String   @default("")
+  mlNeighborhoodId String?
+  mlCityId        String
+  mlCityName      String
+  mlStateId       String
+  mlStateName     String
+  createdAt       DateTime @default(now())
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, city, neighborhood])
+}
+
+// Catálogos por tenant para los selectores del alta de propiedades —
+// editables desde /admin/gestion/categorias en vez de estar fijos en
+// código. Property guarda el nombre como texto plano (no FK) para que
+// borrar o renombrar una categoría no rompa publicaciones existentes.
+model EstatePropertyType {
+  id       String @id @default(cuid())
+  tenantId String
+  name     String
+  order    Int    @default(0)
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model EstateCity {
+  id       String @id @default(cuid())
+  tenantId String
+  name     String
+  order    Int    @default(0)
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model EstateNeighborhood {
+  id       String @id @default(cuid())
+  tenantId String
+  name     String
+  order    Int    @default(0)
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+// Igual criterio que EstatePropertyType: EstateContract guarda el nombre
+// como texto plano, no FK, para que borrar o renombrar acá no rompa
+// contratos ya guardados.
+model EstateContractType {
+  id       String @id @default(cuid())
+  tenantId String
+  name     String
+  order    Int    @default(0)
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model EstatePropertyDestination {
+  id       String @id @default(cuid())
+  tenantId String
+  name     String
+  order    Int    @default(0)
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model EstateMedia {
+  id         String         @id @default(cuid())
+  tenantId   String
+  propertyId String
+  url        String
+  position   Int            @default(0)
+  property   EstateProperty @relation(fields: [propertyId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@index([tenantId, propertyId])
+}
+
+model EstateInquiry {
+  assignedAgentId String?
+  assignedAgent   EstateAgent?    @relation(fields: [assignedAgentId, tenantId], references: [id, tenantId])
+  searchCriteria  Json?
+  id              String          @id @default(cuid())
+  tenantId        String
+  contactId       String
+  propertyId      String?
+  message         String
+  source          String          @default("ADMIN")
+  status          String          @default("NEW")
+  notes           String          @default("")
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  tenant          Tenant          @relation(fields: [tenantId], references: [id])
+  contact         EstateContact   @relation(fields: [contactId, tenantId], references: [id, tenantId])
+  property        EstateProperty? @relation(fields: [propertyId, tenantId], references: [id, tenantId])
+  statusChanges   EstateInquiryStatusChange[]
+
+  @@index([tenantId, assignedAgentId])
+  @@index([tenantId, status, createdAt])
+}
+
+// Historial de estados de una consulta: quién la marcó como leída,
+// contactada, etc. El nombre se guarda copiado (no solo el userId) para que
+// el historial siga diciendo quién fue aunque después se borre el usuario.
+model EstateInquiryStatusChange {
+  id            String        @id @default(cuid())
+  inquiryId     String
+  status        String
+  changedById   String?
+  changedByName String
+  createdAt     DateTime      @default(now())
+  inquiry       EstateInquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+
+  @@index([inquiryId, createdAt])
+}
+
+model EstateVisit {
+  id         String         @id @default(cuid())
+  tenantId   String
+  propertyId String
+  contactId  String
+  agentName  String
+  startsAt   DateTime
+  endsAt     DateTime
+  status     String         @default("SCHEDULED")
+  notes      String         @default("")
+  tenant     Tenant         @relation(fields: [tenantId], references: [id])
+  property   EstateProperty @relation(fields: [propertyId, tenantId], references: [id, tenantId])
+  contact    EstateContact  @relation(fields: [contactId, tenantId], references: [id, tenantId])
+
+  @@index([tenantId, startsAt])
+}
+
+model EstateContract {
+  id                  String   @id @default(cuid())
+  tenantId            String
+  propertyId          String
+  contactId           String
+  reference           String
+  startsAt            DateTime
+  endsAt              DateTime
+  amount              Decimal  @db.Decimal(16, 2)
+  currency            String   @default("ARS")
+  status              String   @default("DRAFT")
+  contractType        String?
+  propertyDestination String?
+
+  // ---- Condiciones de pago (Etapa 2) ----
+  dueDay            Int?
+  graceDays         Int?
+  firstChargePeriod String? // "YYYY-MM", mismo formato que EstateCharge.period — solo guardado, sin generación automática todavía.
+  paymentMethod     String? // TRANSFER | MERCADOPAGO | CASH | OWNER_DIRECT
+  collectedBy       String? // AGENCY | OWNER
+  lateFeeEnabled    Boolean  @default(false)
+  lateFeeType       String? // PERCENTAGE | FIXED
+  lateFeeValue      Decimal? @db.Decimal(16, 2)
+  lateFeeFromDay    Int?
+  lateFeeFrequency  String? // DAILY | MONTHLY | ONCE
+  lateFeeCap        Decimal? @db.Decimal(16, 2)
+
+  // ---- Actualización (Etapa 3) ----
+  updateType      String    @default("NONE") // NONE | IPC | ICL | FIXED_PERCENT | STEPPED | MANUAL | OTHER_INDEX
+  updateFrequency String? // MONTHLY | QUARTERLY | FOUR_MONTHLY | SEMIANNUAL | ANNUAL | CUSTOM
+  firstUpdateAt   DateTime?
+  updatePercent   Decimal?  @db.Decimal(6, 2)
+  updateRounding  String? // EXACT | ROUND_100 | ROUND_1000
+  adjustmentNotes String    @default("")
+
+  // ---- Depósito y garantía (Etapa 4) ----
+  hasDeposit          Boolean   @default(false)
+  depositAmount       Decimal?  @db.Decimal(16, 2)
+  depositCurrency     String?
+  depositInstallments Int?
+  depositStatus       String? // PENDING | PARTIAL | PAID
+  depositHeldBy       String? // AGENCY | OWNER
+  guaranteeType       String? // OWNER_PROPERTY | INSURANCE | PAYSLIP | BOND | OTHER
+  guaranteeExpiresAt  DateTime?
+
+  // ---- Estado del inmueble al iniciar el alquiler (Etapa 7, opcional) ----
+  // Marcado a mano por el personal de la inmobiliaria — no hay portal de
+  // autogestión para que inquilino/propietario acepten ellos mismos todavía.
+  tenantAcceptedHandoverAt DateTime?
+  ownerAcceptedHandoverAt  DateTime?
+
+  notes                    String                        @default("")
+  createdAt                DateTime                      @default(now())
+  tenant                   Tenant                        @relation(fields: [tenantId], references: [id])
+  property                 EstateProperty                @relation(fields: [propertyId, tenantId], references: [id, tenantId])
+  contact                  EstateContact                 @relation(fields: [contactId, tenantId], references: [id, tenantId])
+  charges                  EstateCharge[]
+  documents                EstateContractDocument[]
+  handoverPhotos           EstateContractHandoverPhoto[]
+  guarantors               EstateContractGuarantor[]
+  chargeConcepts           EstateContractChargeConcept[]
+  estateBillingSuggestions EstateBillingSuggestion[]
+
+  @@unique([id, tenantId])
+  @@unique([tenantId, reference])
+  @@index([tenantId, endsAt])
+}
+
+// Documentos del contrato (contrato firmado, inventario, acta de entrega,
+// etc.) — Etapa 5. Uno-a-muchos porque puede haber más de uno del mismo
+// tipo con el tiempo (ej. addendas). Sin enforcement de "visibility" todavía:
+// no hay ningún portal externo que lea EstateContract hoy, es metadata para
+// cuando ese portal exista.
+model EstateContractDocument {
+  id         String         @id @default(cuid())
+  tenantId   String
+  contractId String
+  title      String
+  type       String // SIGNED_CONTRACT | INVENTORY | DELIVERY_ACT | OTHER
+  visibility String         @default("AGENCY_ONLY") // AGENCY_ONLY | TENANT | OWNER | BOTH
+  url        String
+  createdAt  DateTime       @default(now())
+  tenant     Tenant         @relation(fields: [tenantId], references: [id])
+  contract   EstateContract @relation(fields: [contractId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@index([tenantId, contractId])
+}
+
+// Fotos del estado del inmueble al iniciar el alquiler — Etapa 7 (opcional).
+model EstateContractHandoverPhoto {
+  id         String         @id @default(cuid())
+  tenantId   String
+  contractId String
+  url        String
+  createdAt  DateTime       @default(now())
+  tenant     Tenant         @relation(fields: [tenantId], references: [id])
+  contract   EstateContract @relation(fields: [contractId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@index([tenantId, contractId])
+}
+
+// Garantes del contrato — varios-a-muchos: un contrato puede tener más de
+// un garante y un mismo contacto puede ser garante de varios contratos.
+model EstateContractGuarantor {
+  id         String         @id @default(cuid())
+  tenantId   String
+  contractId String
+  contactId  String
+  createdAt  DateTime       @default(now())
+  tenant     Tenant         @relation(fields: [tenantId], references: [id])
+  contract   EstateContract @relation(fields: [contractId, tenantId], references: [id, tenantId], onDelete: Cascade)
+  contact    EstateContact  @relation(fields: [contactId, tenantId], references: [id, tenantId])
+
+  @@unique([contractId, contactId])
+  @@index([tenantId, contractId])
+  @@index([tenantId, contactId])
+}
+
+// Conceptos que habitualmente se le suman al inquilino junto con el
+// alquiler (expensas, ABL, tasas). No guarda un monto fijo: el conjunto de
+// conceptos que corresponde puede cambiar de un mes a otro, así que cada
+// período se arma una EstateBillingSuggestion (kind EXTRA_CHARGES) para
+// revisar a mano qué aplica y cuánto sale — ver /api/cron/estate-billing.
+// lastAmount/lastCurrency son solo para precargar la sugerencia siguiente,
+// nunca se cobran solos.
+model EstateContractChargeConcept {
+  id           String         @id @default(cuid())
+  tenantId     String
+  contractId   String
+  name         String
+  active       Boolean        @default(true)
+  lastAmount   Decimal?       @db.Decimal(16, 2)
+  lastCurrency String?
+  createdAt    DateTime       @default(now())
+  tenant       Tenant         @relation(fields: [tenantId], references: [id])
+  contract     EstateContract @relation(fields: [contractId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@index([tenantId, contractId])
+}
+
+// Valor mensual publicado de un índice (IPC, ICL, etc.) — Etapa 6.3, lo
+// carga el propio tenant a mano cada mes porque no hay integración con
+// ninguna fuente externa (INDEC/BCRA) en este codebase. El cron de
+// actualización lo consulta; si no está cargado para el período que
+// corresponde, deja el contrato marcado "pendiente de índice" en vez de
+// inventar un valor.
+model EstateRentIndexValue {
+  id       String  @id @default(cuid())
+  tenantId String
+  index    String // IPC | ICL | OTHER_INDEX
+  period   String // "YYYY-MM"
+  percent  Decimal @db.Decimal(6, 2)
+  tenant   Tenant  @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, index, period])
+  @@index([tenantId, index])
+}
+
+// Cargos/actualizaciones que el cron de automatización calculó pero no
+// aplicó todavía — "modo revisión" (Etapa 6.5). Se borra la fila al
+// aprobar o descartar.
+model EstateBillingSuggestion {
+  id         String         @id @default(cuid())
+  tenantId   String
+  contractId String
+  kind       String // CHARGE | LATE_FEE | RENT_UPDATE
+  period     String // "YYYY-MM"
+  payload    Json // detalle específico de kind (monto sugerido, etc.)
+  createdAt  DateTime       @default(now())
+  tenant     Tenant         @relation(fields: [tenantId], references: [id])
+  contract   EstateContract @relation(fields: [contractId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@unique([contractId, kind, period])
+  @@index([tenantId])
+}
+
+model EstateBuilding {
+  id        String       @id @default(cuid())
+  tenantId  String
+  name      String
+  address   String
+  notes     String       @default("")
+  createdAt DateTime     @default(now())
+  tenant    Tenant       @relation(fields: [tenantId], references: [id])
+  units     EstateUnit[]
+
+  @@unique([id, tenantId])
+}
+
+model EstateUnit {
+  id              String         @id @default(cuid())
+  tenantId        String
+  buildingId      String
+  label           String
+  coefficient     Decimal        @db.Decimal(9, 6)
+  responsibleName String
+  building        EstateBuilding @relation(fields: [buildingId, tenantId], references: [id, tenantId])
+  charges         EstateCharge[]
+
+  @@unique([id, tenantId])
+  @@unique([buildingId, label])
+}
+
+model EstateCharge {
+  id             String          @id @default(cuid())
+  tenantId       String
+  contractId     String?
+  unitId         String?
+  concept        String
+  period         String
+  dueAt          DateTime
+  amount         Decimal         @db.Decimal(16, 2)
+  currency       String          @default("ARS")
+  cancelled      Boolean         @default(false)
+  // Etapa 4 (recordatorio de vencimiento) — se marca al mandar el mail para
+  // no reenviarlo cada día que corre el cron hasta que se pague.
+  reminderSentAt DateTime?
+  createdAt      DateTime        @default(now())
+  tenant         Tenant          @relation(fields: [tenantId], references: [id])
+  contract       EstateContract? @relation(fields: [contractId, tenantId], references: [id, tenantId])
+  unit           EstateUnit?     @relation(fields: [unitId, tenantId], references: [id, tenantId])
+  receipts       EstateReceipt[]
+
+  @@unique([id, tenantId])
+  @@unique([contractId, period, concept])
+  @@unique([unitId, period, concept])
+  @@index([tenantId, dueAt])
+}
+
+// Recibos manuales confirmados. No representa comprobantes pendientes ni pagos online.
+model EstateReceipt {
+  id             String       @id @default(cuid())
+  tenantId       String
+  chargeId       String
+  amount         Decimal      @db.Decimal(16, 2)
+  method         String
+  reference      String
+  idempotencyKey String       @unique
+  paidAt         DateTime
+  createdAt      DateTime     @default(now())
+  tenant         Tenant       @relation(fields: [tenantId], references: [id])
+  charge         EstateCharge @relation(fields: [chargeId, tenantId], references: [id, tenantId])
+
+  @@index([tenantId, chargeId])
+}
+
+model EstateMaintenance {
+  id          String         @id @default(cuid())
+  tenantId    String
+  propertyId  String
+  title       String
+  description String
+  priority    String         @default("NORMAL")
+  status      String         @default("OPEN")
+  supplier    String         @default("")
+  createdAt   DateTime       @default(now())
+  tenant      Tenant         @relation(fields: [tenantId], references: [id])
+  property    EstateProperty @relation(fields: [propertyId, tenantId], references: [id, tenantId])
+
+  @@index([tenantId, status])
+}
+
+model EstateAuditEvent {
+  id        String   @id @default(cuid())
+  tenantId  String
+  actorId   String
+  // Nombre copiado al momento del cambio (como en el historial de
+  // consultas): el registro sigue diciendo quién fue aunque se borre el
+  // usuario. summary es el texto legible ("Propiedad «Casa en…»").
+  actorName String   @default("")
+  summary   String   @default("")
+  entity    String
+  entityId  String
+  action    String
+  createdAt DateTime @default(now())
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, createdAt])
+}
+
+model EstateDeal {
+  id         String         @id @default(cuid())
+  tenantId   String
+  propertyId String
+  contactId  String
+  operation  String
+  stage      String         @default("NEGOTIATION")
+  amount     Decimal?       @db.Decimal(16, 2)
+  currency   String         @default("USD")
+  agentName  String
+  notes      String         @default("")
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  tenant     Tenant         @relation(fields: [tenantId], references: [id])
+  property   EstateProperty @relation(fields: [propertyId, tenantId], references: [id, tenantId])
+  contact    EstateContact  @relation(fields: [contactId, tenantId], references: [id, tenantId])
+
+  @@index([tenantId, stage])
+}
+
+model EstateValuation {
+  id           String        @id @default(cuid())
+  tenantId     String
+  contactId    String
+  address      String
+  propertyType String
+  status       String        @default("NEW")
+  amount       Decimal?      @db.Decimal(16, 2)
+  currency     String        @default("USD")
+  notes        String        @default("")
+  createdAt    DateTime      @default(now())
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  contact      EstateContact @relation(fields: [contactId, tenantId], references: [id, tenantId])
+
+  @@index([tenantId, status])
+}
+
+// ---------- Agente de ventas IA ----------
+
+enum AiProvider {
+  openai
+  gemini
+}
+
+// Una fila por charla con el agente de ventas IA del sitio público —
+// sessionId identifica al visitante (cookie/localStorage del navegador, sin
+// cuenta necesaria). name/phone son los datos que deja al abrir el chat
+// (o null si eligió "Ahora no"), para que el equipo lo pueda contactar por
+// WhatsApp si la IA no resuelve la consulta. handledAt null = pendiente de
+// revisar en /admin/conversaciones.
+model EstateAiConversation {
+  id            String    @id @default(cuid())
+  tenantId      String
+  sessionId     String
+  name          String?
+  phone         String?
+  handledAt     DateTime?
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  messages      EstateAiMessage[]
+
+  @@unique([tenantId, sessionId])
+  @@index([tenantId, updatedAt])
+}
+
+model EstateAiMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           String // "user" | "assistant"
+  content        String
+  propertyIds    String[] @default([])
+  createdAt      DateTime @default(now())
+  conversation   EstateAiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
+
+// ---------- Email marketing ----------
+
+// Lista de suscriptores. También sirve de lista de bajas: si un contacto
+// del CRM se da de baja se crea/actualiza su fila con unsubscribedAt, y los
+// envíos masivos excluyen cualquier mail con baja.
+model EmailSubscriber {
+  id             String    @id @default(cuid())
+  tenantId       String
+  email          String
+  name           String    @default("")
+  source         String    @default("WEB")
+  unsubscribedAt DateTime?
+  createdAt      DateTime  @default(now())
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, email])
+  @@index([tenantId, unsubscribedAt])
+}
+
+// Cada envío (a toda la lista o a un cliente puntual). content guarda el
+// mail tal como se armó en el editor, para poder verlo después.
+model EmailCampaign {
+  id             String                   @id @default(cuid())
+  tenantId       String
+  subject        String
+  template       String
+  content        Json
+  audience       String                   @default("LIST")
+  status         String                   @default("SENDING")
+  recipientCount Int                      @default(0)
+  sentCount      Int                      @default(0)
+  failedCount    Int                      @default(0)
+  createdById    String?
+  createdByName  String                   @default("")
+  createdAt      DateTime                 @default(now())
+  finishedAt     DateTime?
+  tenant         Tenant                   @relation(fields: [tenantId], references: [id])
+  recipients     EmailCampaignRecipient[]
+
+  @@index([tenantId, createdAt])
+}
+
+model EmailCampaignRecipient {
+  id         String        @id @default(cuid())
+  campaignId String
+  email      String
+  name       String        @default("")
+  success    Boolean?
+  error      String?
+  sentAt     DateTime?
+  campaign   EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+}

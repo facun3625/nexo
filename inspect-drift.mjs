@@ -1,0 +1,10 @@
+import pg from "pg";
+const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+await client.connect();
+const tables = await client.query(`SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name ILIKE '%delivery%'`);
+console.log("tables:", tables.rows);
+const cols = await client.query(`SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name='Order' AND column_name ILIKE '%delivery%'`);
+console.log("Order columns:", cols.rows);
+const mig = await client.query(`SELECT migration_name, finished_at FROM _prisma_migrations WHERE migration_name ILIKE '%delivery%'`);
+console.log("migration rows:", mig.rows);
+await client.end();

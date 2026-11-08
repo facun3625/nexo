@@ -1,0 +1,41 @@
+# deps
+node_modules/
+
+# next
+.next/
+.next-build/
+.next-old/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# prisma generated client
+src/generated/
+
+# env
+.env
+.env.*
+!.env.example
+
+# os / editor
+.DS_Store
+.vscode/
+.idea/
+
+# logs
+npm-debug.log*
+*.log
+
+# datos locales (no versionar)
+data/GeoLite2-City.mmdb
+data/backups/*
+!data/backups/.gitkeep
+public/uploads/
+reference-real-estate/**/*.db
+
+# datos exportados del cliente anterior (Gerelli)
+prisma/seed-data/wordpress-export.xml
+prisma/seed-data/r2-url-map.json
+
+# fotos de demo sin uso (otro proyecto)
+public/demo-photos/

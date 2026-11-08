@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model OperationType {
+  id        String  @id @default(uuid())
+  name      String  @unique
+  order     Int     @default(0)
+  whatsapp  String?
+  color     String  @default("#df691a")
+}
+
+model City {
+  id    String @id @default(uuid())
+  name  String @unique
+  order Int    @default(0)
+}
+
+model PropertyType {
+  id    String @id @default(uuid())
+  name  String @unique
+  order Int    @default(0)
+}
+
+model Property {
+  id           String   @id @default(uuid())
+  title        String
+  description  String
+  price        Float
+  city         String
+  address      String
+  lat          Float?
+  lng          Float?
+  imageUrl     String?
+  images       String?  // JSON array of additional image URLs
+  videoUrl     String?  // YouTube or Vimeo embed URL
+  type         String   // "Venta" or "Alquiler"
+  propertyType String   // "Casa", "Departamento", "Terreno", etc.
+  bedrooms     Int?
+  bathrooms    Int?
+  hasGarage    Boolean  @default(false)
+  garages      Int?
+  coveredArea  Float?
+  totalArea    Float?
+  currency      String   @default("USD")
+  pricePerMonth Boolean  @default(false)
+  featured      Boolean  @default(false)
+  featuredOrder Int?
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model SiteConfig {
+  id              String   @id @default("singleton")
+  facebook        String?
+  instagram       String?
+  whatsapp        String?
+  phone           String?
+  email           String?
+  address         String?
+  metaDescription String?
+  ogImage         String?
+  updatedAt       DateTime @updatedAt
+}
+
+model PropertyAlert {
+  id                  String   @id @default(uuid())
+  nombre              String
+  email               String
+  ciudad              String?
+  tipo                String?
+  operacion           String?
+  dormitorios         Int?
+  pending             Boolean  @default(false)
+  lastMatchPropertyId String?
+  createdAt           DateTime @default(now())
+}
+
+model EmailLog {
+  id        String   @id @default(uuid())
+  to        String
+  nombre    String
+  subject   String
+  alertId   String
+  createdAt DateTime @default(now())
+}
+
+model AIInstruction {
+  id        String   @id @default(uuid())
+  text      String
+  createdAt DateTime @default(now())
+}
+
+model ContentBlock {
+  key       String  @id
+  value     String
+  label     String  // Nombre amigable para el admin
+  page      String  // "home", "nosotros", "tasacion"
+  multiline Boolean @default(false)
+}
+
+model ContactRequest {
+  id        String   @id @default(uuid())
+  nombre    String
+  telefono  String?
+  email     String?
+  consulta  String?
+  source    String   @default("chat") // "chat" | "web"
+  status    String   @default("pending")
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model TasacionRequest {
+  id           String   @id @default(uuid())
+  address      String
+  propertyType String
+  area         Float?
+  phone        String
+  email        String
+  status       String   @default("pending") // "pending" | "contacted" | "done"
+  notes        String?
+  createdAt    DateTime @default(now())
+}
+
+model PageView {
+  id         String   @id @default(uuid())
+  path       String
+  propertyId String?
+  sessionId  String?
+  createdAt  DateTime @default(now())
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  name         String?
+  role         String   @default("admin") // "superadmin" | "admin"
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  AuditLog     AuditLog[]
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  userName   String?
+  action     String   // "CREATE", "UPDATE", "DELETE", "LOGIN", "PASSWORD_CHANGE"
+  entityType String   // "Property", "User", "SiteConfig", "ContentBlock", "Consorcio"
+  entityId   String?
+  details    String?  // JSON stringified details
+  createdAt  DateTime @default(now())
+  user       User?    @relation(fields: [userId], references: [id])
+}
+
+model Consorcio {
+  id        String   @id @default(uuid())
+  nombre    String
+  banco     String?
+  titular   String?  // Nombre de la cuenta
+  cuit      String?
+  cbu       String?
+  ca        String?  // Caja de ahorros / Cuenta corriente
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
