@@ -14,6 +14,9 @@ import { AiAgentWidget } from "@/components/estate/ai-agent-widget";
 import { getAssistantStatus } from "@/lib/ai-agent/status";
 import { SITE_URL } from "@/lib/site-url";
 import { jsonLdScript, organizationJsonLd } from "@/lib/seo";
+import { auth } from "@/auth";
+import { getMaintenanceConfig, isMaintenanceExempt } from "@/lib/maintenance";
+import { MaintenanceScreen } from "@/components/store/maintenance-screen";
 
 const barlow = Barlow({
   variable: "--font-sans",
@@ -40,6 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
     getStoreSettings(tenant.id),
     getSeoSettings(tenant.id),
   ]);
+  const maintenance = await getMaintenanceConfig(tenant.id);
   const title = seo.title || storeName;
   const description =
     seo.description ||
@@ -53,6 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: title, template: `%s | ${storeName}` },
     description,
     applicationName: storeName,
+    ...(maintenance.enabled ? { robots: { index: false, follow: false } } : {}),
     icons: faviconUrl ? { icon: faviconUrl } : undefined,
     // El layout de /admin pisa esto con su propio manifest (metadata de
     // hijo gana sobre la de padre), así que las páginas del panel siguen
@@ -100,10 +105,37 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   }
 
   const showAiWidget = !pathname.startsWith("/admin") && !pathname.startsWith("/agente") && !pathname.startsWith("/qr/");
-  const [storeSettings, assistantStatus] = await Promise.all([
+  const [storeSettings, assistantStatus, maintenance] = await Promise.all([
     getStoreSettings(tenant.id),
     showAiWidget ? getAssistantStatus(tenant.id) : Promise.resolve(null),
+    getMaintenanceConfig(tenant.id),
   ]);
+
+  // Modo mantenimiento: el público ve solo logo + mensaje. El equipo
+  // (ADMIN/AGENT logueado) sigue viendo el sitio, con una barra de aviso.
+  let maintenanceBlocked = false;
+  let maintenanceBar = false;
+  if (maintenance.enabled && !isMaintenanceExempt(pathname)) {
+    const role = (await auth())?.user?.role;
+    const isStaff = role === "ADMIN" || role === "AGENT";
+    maintenanceBlocked = !isStaff;
+    maintenanceBar = isStaff;
+  }
+
+  if (maintenanceBlocked) {
+    return (
+      <html lang="es" className={htmlClassName}>
+        <body className="min-h-full flex flex-col">
+          <MaintenanceScreen
+            storeName={storeSettings.storeName}
+            logoUrl={storeSettings.logoUrl}
+            logoHeight={storeSettings.logoHeight}
+            html={maintenance.html}
+          />
+        </body>
+      </html>
+    );
+  }
   // Se pisa acá --primary/--primary-foreground (no en :root, que también
   // usa el panel admin con su propio theming) para que "Color de botones"
   // de Identidad alcance a cualquier bg-primary/text-primary del sitio
@@ -129,6 +161,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                   type="application/ld+json"
                   dangerouslySetInnerHTML={jsonLdScript(organizationJsonLd(storeSettings))}
                 />
+                {maintenanceBar && (
+                  <a
+                    href="/admin/configuracion?tab=mantenimiento"
+                    className="sticky top-0 z-[1000] block bg-amber-500 px-4 py-1.5 text-center text-sm font-medium text-black"
+                  >
+                    Sitio en mantenimiento: los visitantes no lo ven. Desactivar →
+                  </a>
+                )}
                 <StorePwaProvider>
                   <PublicAnalyticsTracker />
                   {children}

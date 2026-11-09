@@ -1,5 +1,7 @@
 import { getStoreSettings, getSeoSettings, getTelegramSettings, getAiAssistantSettings } from "@/lib/settings";
 import { getPopupConfig } from "@/lib/popup";
+import { getMaintenanceConfig } from "@/lib/maintenance";
+import { MaintenanceForm } from "./maintenance-form";
 import { requireTenantAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 import { getMercadoLibreSettings } from "@/lib/mercadolibre/settings";
@@ -18,7 +20,7 @@ import { listBackups, MAX_BACKUPS } from "@/lib/backup";
 import { WhatsappTemplatesForm } from "./whatsapp-templates-form";
 import { getWhatsappTemplates } from "@/lib/settings";
 
-const VALID_TABS = new Set(["popup", "seo", "telegram", "ia", "mercadolibre", "correo", "whatsapp", "backups"]);
+const VALID_TABS = new Set(["mantenimiento", "popup", "seo", "telegram", "ia", "mercadolibre", "correo", "whatsapp", "backups"]);
 
 const backupDate = new Intl.DateTimeFormat("es-AR", {
   dateStyle: "full",
@@ -35,8 +37,8 @@ export default async function ConfiguracionPage({
   const { tenant, session } = await requireTenantAdmin();
   const isAdmin = session.user.role === "ADMIN";
   const { tab, mlError } = await searchParams;
-  const initialTab = tab && VALID_TABS.has(tab) ? tab : "popup";
-  const [settings, popupConfig, seoSettings, telegramSettings, aiSettings, mlSettings, properties, mlLocations, backups, smtpSettings] = await Promise.all([
+  const initialTab = tab && VALID_TABS.has(tab) ? tab : "mantenimiento";
+  const [settings, popupConfig, seoSettings, telegramSettings, aiSettings, mlSettings, properties, mlLocations, backups, smtpSettings, maintenanceConfig] = await Promise.all([
     getStoreSettings(tenant.id),
     getPopupConfig(tenant.id),
     getSeoSettings(tenant.id),
@@ -52,6 +54,7 @@ export default async function ConfiguracionPage({
     prisma.estateMlLocation.findMany({ where: { tenantId: tenant.id } }),
     isAdmin ? listBackups() : Promise.resolve([]),
     getSmtpSettings(tenant.id),
+    getMaintenanceConfig(tenant.id),
   ]);
 
   const mlLocationRows = properties.map((p) => ({
@@ -66,6 +69,9 @@ export default async function ConfiguracionPage({
 
       <Tabs defaultValue={initialTab}>
         <TabsList className="w-full">
+          <TabsTrigger value="mantenimiento" className="flex-1">
+            Mantenimiento
+          </TabsTrigger>
           <TabsTrigger value="popup" className="flex-1">
             Pop-up
           </TabsTrigger>
@@ -93,6 +99,10 @@ export default async function ConfiguracionPage({
             </TabsTrigger>
           )}
         </TabsList>
+
+        <TabsContent value="mantenimiento">
+          <MaintenanceForm key={JSON.stringify(maintenanceConfig)} config={maintenanceConfig} />
+        </TabsContent>
 
         <TabsContent value="popup">
           <PopupForm key={popupConfig.version} config={popupConfig} />

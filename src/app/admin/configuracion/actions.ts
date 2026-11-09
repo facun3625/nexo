@@ -57,6 +57,34 @@ async function runUpdatePopupConfig(formData: FormData) {
   return { ok: true as const };
 }
 
+// ---------- Modo mantenimiento ----------
+
+export async function updateMaintenanceConfig(formData: FormData) {
+  try {
+    return await runUpdateMaintenanceConfig(formData);
+  } catch (err) {
+    return toUserError(err, "No se pudo guardar la configuración");
+  }
+}
+
+async function runUpdateMaintenanceConfig(formData: FormData) {
+  const { tenant } = await requireTenantAdmin();
+  const enabled = formData.get("enabled") === "true";
+  const html = String(formData.get("html") ?? "");
+
+  await Promise.all([
+    saveTextSetting(tenant.id, String(enabled), "maintenance_enabled"),
+    saveTextSetting(tenant.id, html, "maintenance_html"),
+  ]);
+  revalidatePath("/", "layout");
+  await logActivity(tenant.id, {
+    entity: "configuracion",
+    action: "UPDATE",
+    summary: enabled ? "Puso el sitio en mantenimiento" : "Sacó el sitio de mantenimiento",
+  });
+  return { ok: true as const };
+}
+
 // ---------- Telegram (aviso al equipo) ----------
 
 const telegramSchema = z.object({

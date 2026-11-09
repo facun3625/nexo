@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: nexo
       POSTGRES_DB: nexo
     ports:
-      - "5462:5432"
+      - "5463:5432"
     volumes:
       - nexo_db_data:/var/lib/postgresql/data
 

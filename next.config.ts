@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
         // conecte un dominio propio (cdn.gerellicorrenti.com.ar) va a haber
         // que agregarlo acá también.
         protocol: "https",
-        hostname: "pub-f59926e980074152ab17e8fa8e9ffa0a.r2.dev",
+        hostname: "*.r2.dev",
       },
     ],
   },

@@ -6,8 +6,8 @@ import { prisma } from "../src/lib/prisma";
 import demoData from "./seed-data/demo-inmo-export.json";
 import urlMap from "./seed-data/r2-url-map.json";
 
-const TENANT_ID = "gerelli-tenant";
-const ADMIN_EMAIL = "admin@gerellicorrenti.com.ar";
+const TENANT_ID = "nexo-tenant";
+const ADMIN_EMAIL = "admin@nexo.local";
 
 // Contenido inicial copiado del tenant demo-inmo de Urbi, como punto de
 // partida editable desde el admin — ver PLAN_FORK.md.
@@ -27,8 +27,8 @@ async function main() {
 
   // ---------- Settings (branding + identidad) ----------
   const settingsOverrides: Record<string, string> = {
-    store_name: "Gerreli",
-    seo_title: "Gerreli · Propiedades en Córdoba",
+    store_name: "Nexo Inmobiliaria",
+    seo_title: "Nexo Inmobiliaria · Propiedades",
   };
   const skipKeys = new Set(["ai_agent_enabled"]);
   await prisma.settings.createMany({
@@ -36,7 +36,7 @@ async function main() {
       .filter((s) => !skipKeys.has(s.key))
       .map((s) => {
         let value = settingsOverrides[s.key] ?? mapUrl(s.value) ?? s.value;
-        if (s.key === "about_text") value = value.replaceAll("Horizonte", "Gerreli");
+        if (s.key === "about_text") value = value.replaceAll("Horizonte", "Nexo");
         return { tenantId: TENANT_ID, key: s.key, value };
       }),
   });
