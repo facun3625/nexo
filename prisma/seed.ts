@@ -1,10 +1,18 @@
 import "dotenv/config";
 import { randomBytes } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "../src/lib/prisma";
 import demoData from "./seed-data/demo-inmo-export.json";
-import urlMap from "./seed-data/r2-url-map.json";
+
+// Mapa opcional de URLs viejas → bucket propio. No está en el repo (era del
+// cliente anterior), así que se lee solo si existe en disco.
+const URL_MAP_PATH = path.join(__dirname, "seed-data", "r2-url-map.json");
+const urlMap: Record<string, string> = existsSync(URL_MAP_PATH)
+  ? JSON.parse(readFileSync(URL_MAP_PATH, "utf8"))
+  : {};
 
 const TENANT_ID = "nexo-tenant";
 const ADMIN_EMAIL = "admin@nexo.local";
@@ -13,7 +21,7 @@ const ADMIN_EMAIL = "admin@nexo.local";
 // partida editable desde el admin — ver PLAN_FORK.md.
 function mapUrl(url: string | null | undefined): string | null {
   if (!url) return null;
-  return (urlMap as Record<string, string>)[url] ?? url;
+  return urlMap[url] ?? url;
 }
 
 async function main() {
