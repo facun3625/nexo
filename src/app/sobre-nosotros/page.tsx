@@ -2,15 +2,7 @@ import Link from "next/link";
 import { PhotoBanner } from "@/components/catalog/photo-banner";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import {
-  ShieldCheck,
-  Handshake,
-  Eye,
-  Users,
-  Phone,
-  MapPin,
-  Building2,
-} from "lucide-react";
+import { Phone, MapPin, Building2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
@@ -20,35 +12,11 @@ import { RichText } from "@/components/catalog/rich-text";
 import { AboutGallery } from "@/components/catalog/about-gallery";
 import { WhatsAppIcon } from "@/components/catalog/social-icons";
 import { getCurrentTenant } from "@/lib/tenant";
-import { getAboutContent } from "@/lib/about";
+import { getAboutContent, getAboutValues } from "@/lib/about";
+import { AboutValueIcon } from "@/components/catalog/about-value-icon";
 import { getStoreSettings } from "@/lib/settings";
 import { toWhatsAppLink } from "@/lib/social-links";
 
-const VALUES = [
-  {
-    icon: ShieldCheck,
-    title: "Confianza",
-    description:
-      "Operaciones claras, con toda la información disponible desde el primer contacto.",
-  },
-  {
-    icon: Handshake,
-    title: "Atención personalizada",
-    description:
-      "Te acompañamos en cada paso, desde la búsqueda hasta la firma.",
-  },
-  {
-    icon: Eye,
-    title: "Transparencia",
-    description: "Sin letra chica: precios, estados y condiciones a la vista.",
-  },
-  {
-    icon: Users,
-    title: "Acompañamiento",
-    description:
-      "Seguimos disponibles después de la operación, para lo que necesites.",
-  },
-] as const;
 
 export const metadata = {
   title: "Sobre nosotros",
@@ -60,8 +28,9 @@ export default async function SobreNosotrosPage() {
   const tenant = await getCurrentTenant();
   if (!tenant) notFound();
 
-  const [content, settings, properties] = await Promise.all([
+  const [content, values, settings, properties] = await Promise.all([
     getAboutContent(tenant.id),
+    getAboutValues(tenant.id),
     getStoreSettings(tenant.id),
     prisma.estateProperty.findMany({
       where: { tenantId: tenant.id, published: true },
@@ -171,32 +140,53 @@ export default async function SobreNosotrosPage() {
             </div>
           </div>
 
+          {values.show && values.items.length > 0 && (
           <div>
+            {(values.eyebrow || values.title) && (
             <div className="mb-10 text-center">
+              {values.eyebrow && (
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-                Por qué elegirnos
+                {values.eyebrow}
               </p>
+              )}
+              {values.title && (
               <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">
-                Nuestros valores
+                {values.title}
               </h2>
+              )}
             </div>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {VALUES.map((v) => (
+            )}
+            <div
+              className={cn(
+                "grid gap-5",
+                values.items.length === 1
+                  ? "mx-auto w-full max-w-md"
+                  : values.items.length === 2
+                    ? "mx-auto w-full max-w-3xl sm:grid-cols-2"
+                    : [3, 5, 6].includes(values.items.length)
+                      ? "sm:grid-cols-2 lg:grid-cols-3"
+                      : "sm:grid-cols-2 lg:grid-cols-4",
+              )}
+            >
+              {values.items.map((v, i) => (
                 <div
-                  key={v.title}
+                  key={`${i}-${v.title}`}
                   className="rounded-2xl border bg-muted/30 p-6 transition-[border-color,background-color,box-shadow] duration-200 hover:border-primary/30 hover:bg-card hover:shadow-sm"
                 >
                   <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <v.icon className="size-5" />
+                    <AboutValueIcon icon={v.icon} className="size-5" />
                   </span>
                   <h3 className="mt-4 text-sm font-semibold">{v.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground">
-                    {v.description}
-                  </p>
+                  {v.text && (
+                    <p className="mt-1.5 text-sm text-muted-foreground">
+                      {v.text}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
           </div>
+          )}
 
           {content.media.length > 0 && (
             <div className="flex flex-col gap-4">
@@ -210,12 +200,16 @@ export default async function SobreNosotrosPage() {
           {hasContactCta && (
             <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-6 text-center">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-                  Hablemos
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">
-                  ¿Querés conocernos mejor?
-                </h2>
+                {values.ctaEyebrow && (
+                  <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+                    {values.ctaEyebrow}
+                  </p>
+                )}
+                {values.ctaTitle && (
+                  <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">
+                    {values.ctaTitle}
+                  </h2>
+                )}
               </div>
               <div className="flex flex-col items-center gap-3 sm:flex-row">
                 {phone && (

@@ -1,6 +1,6 @@
 import { getStoreSettings } from "@/lib/settings";
 import { CoverVideoField } from "./cover-video-field";
-import { getAboutContent } from "@/lib/about";
+import { getAboutContent, getAboutValues } from "@/lib/about";
 import { getCatalogFilterSettings, getCatalogFilterLabels } from "@/lib/estate/catalog-filter-settings";
 import { requireTenantAdmin } from "@/lib/require-admin";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +13,7 @@ import { SocialForm } from "./social-form";
 import { FooterForm } from "./footer-form";
 import { CatalogFiltersForm } from "./catalog-filters-form";
 import { ArquitecturaForm } from "./arquitectura-form";
+import { AboutValuesForm } from "./about-values-form";
 import { ArquitecturaVisibility } from "./arquitectura-visibility";
 import { getArqContent } from "@/lib/arquitectura-content";
 
@@ -36,12 +37,13 @@ export default async function PaginaPage({
   const { tenant } = await requireTenantAdmin();
   const { tab } = await searchParams;
   const initialTab = tab && VALID_TABS.has(tab) ? tab : "template";
-  const [settings, aboutContent, catalogFilters, catalogFilterLabels, arqContent] = await Promise.all([
+  const [settings, aboutContent, catalogFilters, catalogFilterLabels, arqContent, aboutValues] = await Promise.all([
     getStoreSettings(tenant.id),
     getAboutContent(tenant.id),
     getCatalogFilterSettings(tenant.id),
     getCatalogFilterLabels(tenant.id),
     getArqContent(tenant.id),
+    getAboutValues(tenant.id),
   ]);
 
   return (
@@ -108,7 +110,10 @@ export default async function PaginaPage({
         </TabsContent>
 
         <TabsContent value="nosotros">
-          <AboutUsForm content={aboutContent} />
+          <div className="flex flex-col gap-4">
+            <AboutUsForm content={aboutContent} />
+            <AboutValuesForm key={JSON.stringify(aboutValues)} values={aboutValues} />
+          </div>
         </TabsContent>
 
         <TabsContent value="arquitectura">

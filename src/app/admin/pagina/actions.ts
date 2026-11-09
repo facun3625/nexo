@@ -11,6 +11,7 @@ import { saveUploadedFile } from "@/lib/storage";
 import { saveTextSetting, saveImageSetting, saveFaviconSetting } from "@/lib/settings-storage";
 import { CATALOG_FILTER_KEYS, CATALOG_FILTER_LABELS } from "@/lib/estate/catalog-filters";
 import { STORE_TEMPLATES } from "./templates";
+import { ABOUT_VALUES_KEY, aboutValuesSchema } from "@/lib/about-values";
 import { ARQ_ENABLED_KEY, ARQ_SETTINGS_KEY, arqContentSchema } from "@/lib/arquitectura";
 
 // ---------- Identidad (nombre, logo, favicon, textos del sitio) ----------
@@ -335,6 +336,33 @@ async function runUpdateAboutText(formData: FormData) {
   revalidatePath("/admin/pagina");
   await logActivity(tenant.id, { entity: "pagina", action: "UPDATE", summary: "Editó el texto de Sobre nosotros" });
   return { ok: true as const };
+}
+
+// Tarjetas de "Nuestros valores" y títulos del cierre de Sobre nosotros.
+export async function saveAboutValues(json: string) {
+  try {
+    const { tenant } = await requireTenantAdmin();
+    let raw: unknown;
+    try {
+      raw = JSON.parse(json);
+    } catch {
+      throw new ActionError("Contenido inválido");
+    }
+    const parsed = aboutValuesSchema.safeParse(raw);
+    if (!parsed.success) throw new ActionError("Revisá los textos: alguno es demasiado largo (o hay más de 8 tarjetas).");
+    const value = JSON.stringify(parsed.data);
+    await prisma.settings.upsert({
+      where: { tenantId_key: { tenantId: tenant.id, key: ABOUT_VALUES_KEY } },
+      update: { value },
+      create: { tenantId: tenant.id, key: ABOUT_VALUES_KEY, value },
+    });
+    revalidatePath("/sobre-nosotros");
+    revalidatePath("/admin/pagina");
+    await logActivity(tenant.id, { entity: "pagina", action: "UPDATE", summary: "Editó los valores de Sobre nosotros" });
+    return { ok: true as const };
+  } catch (err) {
+    return toUserError(err, "No se pudo guardar");
+  }
 }
 
 export async function addAboutMedia(formData: FormData) {
