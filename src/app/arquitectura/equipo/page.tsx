@@ -23,7 +23,7 @@ export const metadata = {
 export default async function ArquitecturaEquipoPage() {
   const tenant = await getCurrentTenant();
   if (!tenant) notFound();
-  const [{ phone, whatsapp }, content] = await Promise.all([
+  const [{ phone, whatsapp, email }, content] = await Promise.all([
     getStoreSettings(tenant.id),
     getArqContent(tenant.id),
   ]);
@@ -70,7 +70,7 @@ export default async function ArquitecturaEquipoPage() {
               <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-xl">
                 <Image
                   src={c.coverImage}
-                  alt="Equipo de Gerelli Correnti"
+                  alt="Nuestro equipo"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover"
@@ -108,7 +108,7 @@ export default async function ArquitecturaEquipoPage() {
             </div>
           )}
 
-          <ArquitecturaContact phone={phone} whatsapp={whatsapp} />
+          <ArquitecturaContact phone={phone} whatsapp={whatsapp} email={email} />
         </div>
       </main>
       <StoreFooter />

@@ -191,9 +191,9 @@ export function ArquitecturaForm({ content }: { content: ArqContent }) {
 
   async function reset() {
     const ok = await confirm({
-      title: "Restablecer contenido",
-      description: "Vuelve a los textos y fotos originales (los del sitio anterior). Se pierden los cambios guardados.",
-      confirmLabel: "Restablecer",
+      title: "Vaciar contenido",
+      description: "Borra todos los textos y fotos de Arquitectura. No se puede deshacer.",
+      confirmLabel: "Vaciar",
       destructive: true,
     });
     if (!ok) return;
@@ -203,7 +203,7 @@ export function ArquitecturaForm({ content }: { content: ArqContent }) {
         toast.error(result.error);
         return;
       }
-      toast.success("Contenido restablecido");
+      toast.success("Contenido vaciado");
       window.location.reload();
     });
   }
@@ -364,7 +364,7 @@ export function ArquitecturaForm({ content }: { content: ArqContent }) {
 
       <div className="sticky bottom-0 z-10 -mx-1 flex flex-wrap items-center justify-between gap-3 border-t bg-background/95 px-1 py-3 backdrop-blur">
         <Button type="button" variant="ghost" size="sm" disabled={saving} onClick={reset}>
-          Restablecer contenido original
+          Vaciar contenido
         </Button>
         <Button type="button" disabled={saving || gallery.pending} onClick={save}>
           {saving ? "Guardando…" : "Guardar cambios"}

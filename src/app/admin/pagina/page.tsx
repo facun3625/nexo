@@ -13,6 +13,7 @@ import { SocialForm } from "./social-form";
 import { FooterForm } from "./footer-form";
 import { CatalogFiltersForm } from "./catalog-filters-form";
 import { ArquitecturaForm } from "./arquitectura-form";
+import { ArquitecturaVisibility } from "./arquitectura-visibility";
 import { getArqContent } from "@/lib/arquitectura-content";
 
 const VALID_TABS = new Set([
@@ -111,6 +112,7 @@ export default async function PaginaPage({
         </TabsContent>
 
         <TabsContent value="arquitectura">
+          <ArquitecturaVisibility enabled={settings.showArquitectura} />
           <ArquitecturaForm key={JSON.stringify(arqContent)} content={arqContent} />
         </TabsContent>
 

@@ -26,6 +26,11 @@ export type StoreSettings = {
   footerPitchText: string;
   template: string;
   hasServices: boolean;
+  // Sección Arquitectura (Equipo / Servicios / Obras): se prende y apaga
+  // desde Página web → Arquitectura. Apagada, no aparece en el menú ni en
+  // el Inicio y sus páginas dan 404 al público.
+  showArquitectura: boolean;
+  // Hay obras publicadas Y la sección Arquitectura está visible.
   hasDevelopments: boolean;
   headerBgColor: string;
   menuBgColor: string;
@@ -92,6 +97,7 @@ const SETTINGS_KEYS = [
   "store_logo_height",
   "store_footer_logo_height",
   "newsletter_signup",
+  "arq_enabled",
 ] as const;
 
 export const getStoreSettings = cache(
@@ -126,7 +132,8 @@ export const getStoreSettings = cache(
       footerPitchText: map.store_footer_pitch_text || DEFAULT_FOOTER_PITCH_TEXT,
       template: map.store_template || DEFAULT_STORE_TEMPLATE,
       hasServices: false,
-      hasDevelopments: developmentCount > 0,
+      showArquitectura: map.arq_enabled === "true",
+      hasDevelopments: map.arq_enabled === "true" && developmentCount > 0,
       headerBgColor: map.store_header_bg_color || DEFAULT_HEADER_BG_COLOR,
       menuBgColor: map.store_menu_bg_color || DEFAULT_MENU_BG_COLOR,
       footerBgColor: map.store_footer_bg_color || DEFAULT_FOOTER_BG_COLOR,

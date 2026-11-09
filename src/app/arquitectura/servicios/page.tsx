@@ -23,7 +23,7 @@ export const metadata = {
 export default async function ArquitecturaServiciosPage() {
   const tenant = await getCurrentTenant();
   if (!tenant) notFound();
-  const [{ phone, whatsapp }, content] = await Promise.all([
+  const [{ phone, whatsapp, email }, content] = await Promise.all([
     getStoreSettings(tenant.id),
     getArqContent(tenant.id),
   ]);
@@ -89,7 +89,7 @@ export default async function ArquitecturaServiciosPage() {
             </div>
           )}
 
-          <ArquitecturaContact phone={phone} whatsapp={whatsapp} />
+          <ArquitecturaContact phone={phone} whatsapp={whatsapp} email={email} />
         </div>
       </main>
       <StoreFooter />

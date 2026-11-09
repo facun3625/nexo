@@ -13,7 +13,7 @@ const linkClass =
 
 export function StoreNav() {
   const pathname = usePathname();
-  const { hasServices } = useStoreSettings();
+  const { hasServices, showArquitectura } = useStoreSettings();
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : !href.startsWith("#") && pathname.startsWith(href);
 
@@ -53,6 +53,7 @@ export function StoreNav() {
       {/* Desplegable de Arquitectura: se abre con hover y con foco de
           teclado (focus-within); el link principal lleva a la primera
           sección para que en pantallas táctiles también funcione. */}
+      {showArquitectura && (
       <div className="group relative">
         <Link
           href={ARQ_SECTIONS[0].href}
@@ -83,6 +84,7 @@ export function StoreNav() {
           </div>
         </div>
       </div>
+      )}
 
       {after.map(renderLink)}
     </nav>

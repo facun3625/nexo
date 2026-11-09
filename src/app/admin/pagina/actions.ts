@@ -11,7 +11,7 @@ import { saveUploadedFile } from "@/lib/storage";
 import { saveTextSetting, saveImageSetting, saveFaviconSetting } from "@/lib/settings-storage";
 import { CATALOG_FILTER_KEYS, CATALOG_FILTER_LABELS } from "@/lib/estate/catalog-filters";
 import { STORE_TEMPLATES } from "./templates";
-import { ARQ_SETTINGS_KEY, arqContentSchema } from "@/lib/arquitectura";
+import { ARQ_ENABLED_KEY, ARQ_SETTINGS_KEY, arqContentSchema } from "@/lib/arquitectura";
 
 // ---------- Identidad (nombre, logo, favicon, textos del sitio) ----------
 
@@ -435,13 +435,35 @@ export async function saveArqContent(json: string) {
   }
 }
 
+// Muestra u oculta la sección en el sitio público (menú, Inicio y páginas).
+export async function setArqEnabled(enabled: boolean) {
+  try {
+    const { tenant } = await requireTenantAdmin();
+    const value = enabled ? "true" : "false";
+    await prisma.settings.upsert({
+      where: { tenantId_key: { tenantId: tenant.id, key: ARQ_ENABLED_KEY } },
+      update: { value },
+      create: { tenantId: tenant.id, key: ARQ_ENABLED_KEY, value },
+    });
+    revalidatePath("/", "layout");
+    await logActivity(tenant.id, {
+      entity: "pagina",
+      action: "UPDATE",
+      summary: enabled ? "Mostró la sección Arquitectura en el sitio" : "Ocultó la sección Arquitectura del sitio",
+    });
+    return { ok: true as const };
+  } catch (err) {
+    return toUserError(err, "No se pudo cambiar la visibilidad");
+  }
+}
+
 export async function resetArqContent() {
   try {
     const { tenant } = await requireTenantAdmin();
     await prisma.settings.deleteMany({ where: { tenantId: tenant.id, key: ARQ_SETTINGS_KEY } });
     revalidatePath("/arquitectura", "layout");
     revalidatePath("/admin/pagina");
-    await logActivity(tenant.id, { entity: "pagina", action: "UPDATE", summary: "Restauró los textos originales de Arquitectura" });
+    await logActivity(tenant.id, { entity: "pagina", action: "UPDATE", summary: "Vació el contenido de Arquitectura" });
     return { ok: true as const };
   } catch (err) {
     return toUserError(err, "No se pudo restablecer");

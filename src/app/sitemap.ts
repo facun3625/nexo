@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { getCurrentTenant } from "@/lib/tenant";
 import { absoluteUrl } from "@/lib/site-url";
+import { getStoreSettings } from "@/lib/settings";
 
 // Se arma en cada pedido: una propiedad recién publicada entra sola.
 export const dynamic = "force-dynamic";
@@ -25,7 +26,11 @@ const STATIC_PAGES: { path: string; priority: number; changeFrequency: "daily" |
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const tenant = await getCurrentTenant();
   const now = new Date();
-  const pages: MetadataRoute.Sitemap = STATIC_PAGES.map((p) => ({
+  // Con la sección Arquitectura oculta esas páginas dan 404: no se listan.
+  const showArq = tenant ? (await getStoreSettings(tenant.id)).showArquitectura : false;
+  const pages: MetadataRoute.Sitemap = STATIC_PAGES.filter(
+    (p) => showArq || !p.path.startsWith("/arquitectura"),
+  ).map((p) => ({
     url: absoluteUrl(p.path),
     lastModified: now,
     changeFrequency: p.changeFrequency,
@@ -39,10 +44,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { id: true, updatedAt: true, media: { orderBy: { position: "asc" }, take: 5, select: { url: true } } },
       orderBy: { updatedAt: "desc" },
     }),
-    prisma.estateDevelopment.findMany({
-      where: { tenantId: tenant.id, published: true },
-      select: { id: true, updatedAt: true, images: { orderBy: { order: "asc" }, take: 5, select: { url: true } } },
-    }),
+    showArq
+      ? prisma.estateDevelopment.findMany({
+          where: { tenantId: tenant.id, published: true },
+          select: { id: true, updatedAt: true, images: { orderBy: { order: "asc" }, take: 5, select: { url: true } } },
+        })
+      : Promise.resolve([]),
   ]);
 
   return [

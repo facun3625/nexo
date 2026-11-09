@@ -39,6 +39,7 @@ export function MobileHamburgerMenu() {
     facebook,
     youtube,
     hasServices,
+    showArquitectura,
   } = useStoreSettings();
 
   return (
@@ -66,7 +67,9 @@ export function MobileHamburgerMenu() {
                 ? [{ href: "/servicios", label: "Servicios" }]
                 : []),
               { href: "/sobre-nosotros", label: "Sobre nosotros" },
-              { href: "/arquitectura", label: "Arquitectura", children: ARQ_SECTIONS },
+              ...(showArquitectura
+                ? [{ href: "/arquitectura", label: "Arquitectura", children: ARQ_SECTIONS }]
+                : []),
               { href: "/propiedades", label: "Ver todas las propiedades" },
               { href: "/mapa", label: "Propiedades en mapa" },
               { href: "/alertas", label: "Recibir alertas" },

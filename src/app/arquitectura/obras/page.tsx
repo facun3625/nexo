@@ -110,7 +110,7 @@ export default async function ArquitecturaObrasPage({
             )}
           </div>
 
-          <ArquitecturaContact phone={settings.phone} whatsapp={settings.whatsapp} />
+          <ArquitecturaContact phone={settings.phone} whatsapp={settings.whatsapp} email={settings.email} />
         </div>
       </main>
       <StoreFooter />

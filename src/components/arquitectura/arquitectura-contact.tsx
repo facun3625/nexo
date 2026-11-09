@@ -1,17 +1,19 @@
 import { Mail, Phone } from "lucide-react";
 
 import { WhatsAppIcon } from "@/components/catalog/social-icons";
-import { ARQ_EMAIL } from "@/lib/arquitectura";
 import { toWhatsAppLink } from "@/lib/social-links";
 
 // Cierre común de las páginas de Arquitectura.
 export function ArquitecturaContact({
   phone,
   whatsapp,
+  email,
 }: {
   phone: string | null;
   whatsapp: string | null;
+  email: string | null;
 }) {
+  if (!email && !whatsapp && !phone) return null;
   return (
     <section className="mx-auto flex w-full max-w-xl flex-col items-center gap-6 text-center">
       <div>
@@ -22,13 +24,15 @@ export function ArquitecturaContact({
         </p>
       </div>
       <div className="flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
-        <a
-          href={`mailto:${ARQ_EMAIL}`}
-          className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
-        >
-          <Mail className="size-4" />
-          {ARQ_EMAIL}
-        </a>
+        {email && (
+          <a
+            href={`mailto:${email}`}
+            className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+          >
+            <Mail className="size-4" />
+            {email}
+          </a>
+        )}
         {whatsapp ? (
           <a
             href={toWhatsAppLink(whatsapp)}
