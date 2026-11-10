@@ -204,7 +204,7 @@ export function PropertySearchForm({
     >
       <div className="grid min-w-0 flex-1 gap-1 sm:grid-cols-2 lg:flex lg:items-stretch lg:gap-0 lg:divide-x lg:divide-border">
         {inlineKeys.map((key) => (
-          <div key={key} className={`flex min-w-0 flex-1 rounded-xl bg-muted/35 lg:rounded-none lg:bg-transparent ${key === "q" ? "lg:flex-[2.4]" : ""}`}>
+          <div key={key} className={`flex min-w-0 flex-1 rounded-xl bg-muted/35 lg:rounded-none lg:bg-transparent ${key === "q" ? "lg:flex-[1.6]" : ""}`}>
             {fieldByKey[key]}
           </div>
         ))}
