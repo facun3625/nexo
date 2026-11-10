@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ChevronDownIcon, ChevronUpIcon, ImagePlusIcon, Trash2Icon } from "lucide-react";
+import { ChevronDownIcon, ChevronUpIcon, ImagePlusIcon, StarIcon, Trash2Icon } from "lucide-react";
 import {
   deleteEstatePropertyImage,
   reorderEstatePropertyImages,
@@ -47,9 +47,17 @@ export function PropertyImagesManager({
   }, [previews]);
 
   async function handleMove(index: number, direction: -1 | 1) {
-    if (!propertyId) return;
-    const reordered = move(items, index, index + direction);
-    if (reordered === items) return;
+    await applyOrder(move(items, index, index + direction));
+  }
+
+  // La portada es la primera foto: la llevamos directo al principio.
+  async function handleSetCover(index: number) {
+    if (index === 0) return;
+    if (await applyOrder(move(items, index, 0))) toast.success("Portada actualizada");
+  }
+
+  async function applyOrder(reordered: ExistingImage[]): Promise<boolean> {
+    if (!propertyId || reordered === items) return false;
     setItems(reordered);
     const result = await reorderEstatePropertyImages(
       propertyId,
@@ -58,7 +66,9 @@ export function PropertyImagesManager({
     if ("error" in result) {
       toast.error(result.error);
       setItems(items);
+      return false;
     }
+    return true;
   }
 
   async function handleDelete(id: string) {
@@ -92,6 +102,11 @@ export function PropertyImagesManager({
 
   return (
     <div className="space-y-4">
+      {items.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          Tocá la estrella de una foto para usarla como portada.
+        </p>
+      )}
       {items.length > 0 && (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
           {items.map((img, i) => (
@@ -136,10 +151,23 @@ export function PropertyImagesManager({
                   <Trash2Icon className="size-4" />
                 </button>
               </div>
-              {i === 0 && (
-                <span className="absolute left-1.5 top-1.5 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+              {i === 0 ? (
+                <span className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                  <StarIcon className="size-3 fill-current" />
                   Portada
                 </span>
+              ) : (
+                <button
+                  type="button"
+                  disabled={busyId === img.id}
+                  onClick={() => handleSetCover(i)}
+                  title="Usar como portada"
+                  aria-label="Usar como portada"
+                  className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-white transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-30"
+                >
+                  <StarIcon className="size-3" />
+                  <span className="hidden group-hover:inline">Hacer portada</span>
+                </button>
               )}
             </div>
           ))}
