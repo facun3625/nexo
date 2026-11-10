@@ -52,6 +52,13 @@ const nextConfig: NextConfig = {
       { source: "/emprendimientos", destination: "/arquitectura/obras", permanent: true },
       { source: "/emprendimientos/:id", destination: "/arquitectura/obras/:id", permanent: true },
       ...WORDPRESS_REDIRECTS,
+      // Acceso a los correos del dominio (webmail del hosting). No es
+      // permanente: si cambia el servidor, el navegador no queda con el viejo.
+      {
+        source: "/webmail",
+        destination: "https://vps-1620597-x.dattaweb.com:2094/login.php",
+        permanent: false,
+      },
     ];
   },
   experimental: {
