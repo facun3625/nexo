@@ -9,24 +9,23 @@ import { ArquitecturaContact } from "@/components/arquitectura/arquitectura-cont
 import { ArqEditButton } from "@/components/arquitectura/arq-edit-button";
 import { serviceIcon } from "@/components/arquitectura/arq-icons";
 import { parseServiceBody } from "@/lib/arquitectura";
-import { getArqContent } from "@/lib/arquitectura-content";
+import { arqMetadata, getArqContent } from "@/lib/arquitectura-content";
 import { getCurrentTenant } from "@/lib/tenant";
 import { getStoreSettings } from "@/lib/settings";
 
-export const metadata = {
-  title: "Servicios · Arquitectura",
-  description:
-    "Asesoramiento, anteproyecto, proyecto ejecutivo y dirección de obra.",
-  alternates: { canonical: "/arquitectura/servicios" },
-};
+export function generateMetadata() {
+  return arqMetadata("Servicios", "Asesoramiento, anteproyecto, proyecto ejecutivo y dirección de obra.", "/arquitectura/servicios");
+}
 
 export default async function ArquitecturaServiciosPage() {
   const tenant = await getCurrentTenant();
   if (!tenant) notFound();
-  const [{ phone, whatsapp, email }, content] = await Promise.all([
+  const [{ phone, whatsapp, email, arq }, content] = await Promise.all([
     getStoreSettings(tenant.id),
     getArqContent(tenant.id),
   ]);
+  // Página apagada desde el panel (p. ej. si solo se cargan obras).
+  if (!arq.servicios) notFound();
   const c = content.servicios;
 
   return (

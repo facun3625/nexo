@@ -13,7 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useStoreSettings } from "@/lib/store-settings-context";
-import { ARQ_SECTIONS } from "@/lib/arquitectura";
+import { arqSections } from "@/lib/arquitectura";
 import {
   toWhatsAppLink,
   toInstagramLink,
@@ -40,7 +40,9 @@ export function MobileHamburgerMenu() {
     youtube,
     hasServices,
     showArquitectura,
+    arq,
   } = useStoreSettings();
+  const arqLinks = arqSections(arq);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -68,7 +70,9 @@ export function MobileHamburgerMenu() {
                 : []),
               { href: "/sobre-nosotros", label: "Sobre nosotros" },
               ...(showArquitectura
-                ? [{ href: "/arquitectura", label: "Arquitectura", children: ARQ_SECTIONS }]
+                ? arqLinks.length === 1
+                  ? [{ href: arqLinks[0].href, label: arq.label }]
+                  : [{ href: "/arquitectura", label: arq.label, children: arqLinks }]
                 : []),
               { href: "/propiedades", label: "Ver todas las propiedades" },
               { href: "/mapa", label: "Propiedades en mapa" },

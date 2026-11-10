@@ -30,8 +30,8 @@ export function PhotoBanner({
       </div>
       <div style={{ backgroundColor: menuBgColor, color: contrastText(menuBgColor) }}>
         <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
-          <p className="text-xs font-semibold uppercase tracking-[.3em] opacity-75">{eyebrow}</p>
-          <h1 className="mt-1.5 text-2xl font-bold sm:text-3xl">{title}</h1>
+          {eyebrow && <p className="mb-1.5 text-xs font-semibold uppercase tracking-[.3em] opacity-75">{eyebrow}</p>}
+          <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
           {subtitle && <p className="mt-1.5 max-w-2xl text-sm opacity-85 sm:text-base">{subtitle}</p>}
         </div>
       </div>

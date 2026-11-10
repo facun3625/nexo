@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useConfirm } from "@/components/admin/confirm-provider";
-import type { ArqContent } from "@/lib/arquitectura";
+import type { ArqConfig, ArqContent } from "@/lib/arquitectura";
 import { resetArqContent, saveArqContent, uploadArqImage } from "./actions";
 
 function move<T>(arr: T[], from: number, to: number): T[] {
@@ -160,7 +160,9 @@ function Section({ title, href, children }: { title: string; href: string; child
   );
 }
 
-export function ArquitecturaForm({ content }: { content: ArqContent }) {
+// Las páginas apagadas (Equipo / Servicios) no se muestran acá, pero su
+// contenido se conserva por si se vuelven a prender.
+export function ArquitecturaForm({ content, config }: { content: ArqContent; config: ArqConfig }) {
   const router = useRouter();
   const confirm = useConfirm();
   const [data, setData] = useState<ArqContent>(content);
@@ -192,7 +194,7 @@ export function ArquitecturaForm({ content }: { content: ArqContent }) {
   async function reset() {
     const ok = await confirm({
       title: "Vaciar contenido",
-      description: "Borra todos los textos y fotos de Arquitectura. No se puede deshacer.",
+      description: `Borra todos los textos y fotos de ${config.label}. No se puede deshacer.`,
       confirmLabel: "Vaciar",
       destructive: true,
     });
@@ -210,6 +212,7 @@ export function ArquitecturaForm({ content }: { content: ArqContent }) {
 
   return (
     <div className="flex flex-col gap-6 pt-4">
+      {config.equipo && (
       <Section title="Equipo" href="/arquitectura/equipo">
         <ImagePicker label="Foto de portada (arriba de todo)" value={eq.heroImage} onChange={(heroImage) => setEquipo({ heroImage })} />
         <Field label="Bajada de la portada" value={eq.subtitle} onChange={(subtitle) => setEquipo({ subtitle })} />
@@ -306,7 +309,9 @@ export function ArquitecturaForm({ content }: { content: ArqContent }) {
           />
         </div>
       </Section>
+      )}
 
+      {config.servicios && (
       <Section title="Servicios" href="/arquitectura/servicios">
         <ImagePicker label="Foto de portada" value={sv.heroImage} onChange={(heroImage) => setServicios({ heroImage })} />
         <Field label="Bajada de la portada" value={sv.subtitle} onChange={(subtitle) => setServicios({ subtitle })} />
@@ -353,8 +358,9 @@ export function ArquitecturaForm({ content }: { content: ArqContent }) {
           onChange={(collageImage) => setServicios({ collageImage })}
         />
       </Section>
+      )}
 
-      <Section title="Obras (portada)" href="/arquitectura/obras">
+      <Section title={`${config.obrasLabel} (portada)`} href="/arquitectura/obras">
         <p className="-mt-2 text-sm text-muted-foreground">
           Las obras en sí se cargan en Gestión → Obras.
         </p>

@@ -15,6 +15,7 @@ import { CatalogFiltersForm } from "./catalog-filters-form";
 import { ArquitecturaForm } from "./arquitectura-form";
 import { AboutValuesForm } from "./about-values-form";
 import { ArquitecturaVisibility } from "./arquitectura-visibility";
+import { ArquitecturaConfigForm } from "./arquitectura-config-form";
 import { getArqContent } from "@/lib/arquitectura-content";
 
 const VALID_TABS = new Set([
@@ -73,7 +74,7 @@ export default async function PaginaPage({
             Nosotros
           </TabsTrigger>
           <TabsTrigger value="arquitectura" className="flex-1">
-            Arquitectura
+            {settings.arq.label}
           </TabsTrigger>
           <TabsTrigger value="contacto" className="flex-1">
             Contacto
@@ -118,7 +119,8 @@ export default async function PaginaPage({
 
         <TabsContent value="arquitectura">
           <ArquitecturaVisibility enabled={settings.showArquitectura} />
-          <ArquitecturaForm key={JSON.stringify(arqContent)} content={arqContent} />
+          <ArquitecturaConfigForm key={JSON.stringify(settings.arq)} config={settings.arq} />
+          <ArquitecturaForm key={JSON.stringify(arqContent)} content={arqContent} config={settings.arq} />
         </TabsContent>
 
         <TabsContent value="contacto">

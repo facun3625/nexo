@@ -9,24 +9,23 @@ import { ArquitecturaHeader } from "@/components/arquitectura/arquitectura-heade
 import { ArquitecturaContact } from "@/components/arquitectura/arquitectura-contact";
 import { ArqEditButton } from "@/components/arquitectura/arq-edit-button";
 import { pillarIcon } from "@/components/arquitectura/arq-icons";
-import { getArqContent } from "@/lib/arquitectura-content";
+import { arqMetadata, getArqContent } from "@/lib/arquitectura-content";
 import { getCurrentTenant } from "@/lib/tenant";
 import { getStoreSettings } from "@/lib/settings";
 
-export const metadata = {
-  title: "Equipo · Arquitectura",
-  description:
-    "Equipo interdisciplinario que integra inmobiliaria y estudio de arquitectura.",
-  alternates: { canonical: "/arquitectura/equipo" },
-};
+export function generateMetadata() {
+  return arqMetadata("Equipo", "Equipo interdisciplinario que integra inmobiliaria y estudio de arquitectura.", "/arquitectura/equipo");
+}
 
 export default async function ArquitecturaEquipoPage() {
   const tenant = await getCurrentTenant();
   if (!tenant) notFound();
-  const [{ phone, whatsapp, email }, content] = await Promise.all([
+  const [{ phone, whatsapp, email, arq }, content] = await Promise.all([
     getStoreSettings(tenant.id),
     getArqContent(tenant.id),
   ]);
+  // Página apagada desde el panel (p. ej. si solo se cargan obras).
+  if (!arq.equipo) notFound();
   const c = content.equipo;
 
   return (

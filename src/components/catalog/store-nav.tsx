@@ -6,14 +6,15 @@ import { ChevronDownIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useStoreSettings } from "@/lib/store-settings-context";
-import { ARQ_SECTIONS } from "@/lib/arquitectura";
+import { arqSections } from "@/lib/arquitectura";
 
 const linkClass =
   "flex min-h-14 items-center whitespace-nowrap border-b-2 border-transparent px-3 py-2 text-[13px] font-medium text-current opacity-80 transition-[opacity,border-color] duration-200 hover:border-current/70 hover:opacity-100 xl:px-4 xl:text-sm";
 
 export function StoreNav() {
   const pathname = usePathname();
-  const { hasServices, showArquitectura } = useStoreSettings();
+  const { hasServices, showArquitectura, arq } = useStoreSettings();
+  const arqLinks = arqSections(arq);
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : !href.startsWith("#") && pathname.startsWith(href);
 
@@ -53,10 +54,19 @@ export function StoreNav() {
       {/* Desplegable de Arquitectura: se abre con hover y con foco de
           teclado (focus-within); el link principal lleva a la primera
           sección para que en pantallas táctiles también funcione. */}
-      {showArquitectura && (
+      {/* Con una sola página (solo Obras) es un link común, sin desplegable. */}
+      {showArquitectura && arqLinks.length === 1 && (
+        <Link
+          href={arqLinks[0].href}
+          className={cn(linkClass, isActive("/arquitectura") && "border-current font-semibold opacity-100")}
+        >
+          {arq.label}
+        </Link>
+      )}
+      {showArquitectura && arqLinks.length > 1 && (
       <div className="group relative">
         <Link
-          href={ARQ_SECTIONS[0].href}
+          href={arqLinks[0].href}
           aria-haspopup="true"
           className={cn(
             linkClass,
@@ -64,12 +74,12 @@ export function StoreNav() {
             isActive("/arquitectura") && "border-current font-semibold opacity-100",
           )}
         >
-          Arquitectura
+          {arq.label}
           <ChevronDownIcon className="size-3.5 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
         </Link>
         <div className="invisible absolute left-0 top-full z-50 min-w-48 translate-y-1 pt-1 opacity-0 transition-[opacity,transform,visibility] duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
           <div className="rounded-xl border bg-popover p-1.5 text-popover-foreground shadow-lg">
-            {ARQ_SECTIONS.map((s) => (
+            {arqLinks.map((s) => (
               <Link
                 key={s.href}
                 href={s.href}

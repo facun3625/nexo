@@ -12,7 +12,7 @@ import { saveTextSetting, saveImageSetting, saveFaviconSetting } from "@/lib/set
 import { CATALOG_FILTER_KEYS, CATALOG_FILTER_LABELS } from "@/lib/estate/catalog-filters";
 import { STORE_TEMPLATES } from "./templates";
 import { ABOUT_VALUES_KEY, aboutValuesSchema } from "@/lib/about-values";
-import { ARQ_ENABLED_KEY, ARQ_SETTINGS_KEY, arqContentSchema } from "@/lib/arquitectura";
+import { ARQ_CONFIG_KEY, ARQ_ENABLED_KEY, ARQ_SETTINGS_KEY, arqConfigSchema, arqContentSchema } from "@/lib/arquitectura";
 
 // ---------- Identidad (nombre, logo, favicon, textos del sitio) ----------
 
@@ -457,6 +457,36 @@ export async function saveArqContent(json: string) {
     revalidatePath("/arquitectura", "layout");
     revalidatePath("/admin/pagina");
     await logActivity(tenant.id, { entity: "pagina", action: "UPDATE", summary: "Editó las páginas de Arquitectura" });
+    return { ok: true as const };
+  } catch (err) {
+    return toUserError(err, "No se pudo guardar");
+  }
+}
+
+// Nombre de la sección, nombre de la página de obras, páginas prendidas y
+// bloque del Inicio.
+export async function saveArqConfig(json: string) {
+  try {
+    const { tenant } = await requireTenantAdmin();
+    let raw: unknown;
+    try {
+      raw = JSON.parse(json);
+    } catch {
+      throw new ActionError("Datos inválidos");
+    }
+    const parsed = arqConfigSchema.safeParse(raw);
+    if (!parsed.success) throw new ActionError("Revisá los nombres: no pueden quedar vacíos ni ser demasiado largos.");
+    await prisma.settings.upsert({
+      where: { tenantId_key: { tenantId: tenant.id, key: ARQ_CONFIG_KEY } },
+      update: { value: JSON.stringify(parsed.data) },
+      create: { tenantId: tenant.id, key: ARQ_CONFIG_KEY, value: JSON.stringify(parsed.data) },
+    });
+    revalidatePath("/", "layout");
+    await logActivity(tenant.id, {
+      entity: "pagina",
+      action: "UPDATE",
+      summary: `Configuró la sección ${parsed.data.label}`,
+    });
     return { ok: true as const };
   } catch (err) {
     return toUserError(err, "No se pudo guardar");

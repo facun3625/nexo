@@ -8,13 +8,60 @@ import { z } from "zod";
 export const ARQ_SETTINGS_KEY = "arq_content";
 export const ARQ_ENABLED_KEY = "arq_enabled";
 
+export const ARQ_CONFIG_KEY = "arq_config";
+
 export const ARQ_SECTIONS = [
   { href: "/arquitectura/equipo", label: "Equipo" },
   { href: "/arquitectura/servicios", label: "Servicios" },
   { href: "/arquitectura/obras", label: "Obras" },
 ] as const;
+export type ArqSectionHref = (typeof ARQ_SECTIONS)[number]["href"];
+export type ArqSection = { href: ArqSectionHref; label: string };
 
 const text = (max: number) => z.string().trim().max(max);
+
+// Cómo se presenta la sección: el nombre (p. ej. "Arquitectura" o
+// "Emprendimientos"), el de la página de obras, qué páginas se muestran
+// (Obras siempre; Equipo y Servicios se pueden apagar) y el bloque que
+// lleva a las obras desde el Inicio. La URL sigue siendo /arquitectura/...
+export const arqConfigSchema = z.object({
+  label: text(40).min(1),
+  obrasLabel: text(40).min(1),
+  equipo: z.boolean(),
+  servicios: z.boolean(),
+  homeTitle: text(120),
+  homeText: text(300),
+});
+export type ArqConfig = z.infer<typeof arqConfigSchema>;
+
+export const ARQ_CONFIG_DEFAULT: ArqConfig = {
+  label: "Arquitectura",
+  obrasLabel: "Obras",
+  equipo: true,
+  servicios: true,
+  homeTitle: "Conocé nuestras obras",
+  homeText: "Proyectos diseñados y dirigidos por nuestro estudio.",
+};
+
+export function mergeArqConfig(stored: unknown): ArqConfig {
+  const raw = stored && typeof stored === "object" ? stored : {};
+  const parsed = arqConfigSchema.safeParse({ ...ARQ_CONFIG_DEFAULT, ...raw });
+  return parsed.success ? parsed.data : ARQ_CONFIG_DEFAULT;
+}
+
+// Páginas visibles, en orden, con el nombre que eligió el tenant para Obras.
+export function arqSections(config: ArqConfig): ArqSection[] {
+  return ARQ_SECTIONS.filter(
+    (s) =>
+      (s.href !== "/arquitectura/equipo" || config.equipo) &&
+      (s.href !== "/arquitectura/servicios" || config.servicios),
+  ).map((s) => (s.href === "/arquitectura/obras" ? { ...s, label: config.obrasLabel } : { ...s }));
+}
+
+// "Obras · Arquitectura" para el <title>; si se llaman igual, una sola vez.
+export function arqPageTitle(config: ArqConfig, page: string): string {
+  return page.toLowerCase() === config.label.toLowerCase() ? page : `${page} · ${config.label}`;
+}
 const url = z.string().trim().max(1000);
 
 export const arqContentSchema = z.object({

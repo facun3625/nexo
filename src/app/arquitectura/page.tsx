@@ -1,7 +1,14 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-// "Arquitectura" en el menú es un desplegable; la URL suelta lleva a la
-// primera sección.
-export default function ArquitecturaPage() {
-  redirect("/arquitectura/equipo");
+import { arqSections } from "@/lib/arquitectura";
+import { getCurrentTenant } from "@/lib/tenant";
+import { getStoreSettings } from "@/lib/settings";
+
+// La URL suelta lleva a la primera página prendida (Equipo, o Obras si es
+// la única).
+export default async function ArquitecturaPage() {
+  const tenant = await getCurrentTenant();
+  if (!tenant) notFound();
+  const { arq } = await getStoreSettings(tenant.id);
+  redirect(arqSections(arq)[0].href);
 }

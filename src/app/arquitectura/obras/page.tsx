@@ -11,14 +11,12 @@ import { ArquitecturaContact } from "@/components/arquitectura/arquitectura-cont
 import { DevelopmentCard } from "@/components/estate/development-card";
 import { getCurrentTenant } from "@/lib/tenant";
 import { getStoreSettings } from "@/lib/settings";
-import { getArqContent } from "@/lib/arquitectura-content";
+import { arqMetadata, getArqContent } from "@/lib/arquitectura-content";
 import { ArqEditButton } from "@/components/arquitectura/arq-edit-button";
 
-export const metadata = {
-  title: "Obras · Arquitectura",
-  description: "Obras diseñadas y dirigidas por el estudio.",
-  alternates: { canonical: "/arquitectura/obras" },
-};
+export function generateMetadata() {
+  return arqMetadata(null, "Obras diseñadas y dirigidas por el estudio.", "/arquitectura/obras");
+}
 
 export default async function ArquitecturaObrasPage({
   searchParams,
@@ -59,7 +57,7 @@ export default async function ArquitecturaObrasPage({
       <StoreHero />
       <ArquitecturaHeader
         active="/arquitectura/obras"
-        title="Obras"
+        title={settings.arq.obrasLabel}
         subtitle={arq.obras.subtitle}
         image={arq.obras.heroImage}
       />
@@ -67,7 +65,7 @@ export default async function ArquitecturaObrasPage({
         <div className="flex flex-col gap-16 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
           <div className="-mb-8 flex justify-end gap-2 empty:hidden lg:-mb-12">
             <ArqEditButton tenantId={tenant.id} href="/admin/pagina?tab=arquitectura" label="Editar portada" />
-            <ArqEditButton tenantId={tenant.id} href="/admin/gestion/emprendimientos" label="Gestionar obras" />
+            <ArqEditButton tenantId={tenant.id} href="/admin/gestion/emprendimientos" label={`Gestionar ${settings.arq.obrasLabel.toLowerCase()}`} />
           </div>
           <div className="flex flex-col gap-8">
             {categories.length > 0 && (

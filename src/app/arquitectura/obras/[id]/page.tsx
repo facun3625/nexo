@@ -12,6 +12,7 @@ import { DevelopmentMapLoader } from "@/components/estate/development-map-loader
 import { MediaCarousel } from "@/components/estate/media-carousel";
 import { prisma } from "@/lib/prisma";
 import { getCurrentTenant } from "@/lib/tenant";
+import { getStoreSettings } from "@/lib/settings";
 import { DevelopmentInquiryForm } from "../development-inquiry-form";
 import { ArqEditButton } from "@/components/arquitectura/arq-edit-button";
 
@@ -70,6 +71,7 @@ export default async function DevelopmentPage({
   params: Promise<{ id: string }>;
 }) {
   const development = await getDevelopment((await params).id);
+  const { arq } = await getStoreSettings(development.tenantId);
   return (
     <div className="public-inner-page public-detail-page flex flex-1 flex-col">
       <StoreHero />
@@ -80,7 +82,7 @@ export default async function DevelopmentPage({
               href="/arquitectura/obras"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              ← Volver a obras
+              ← Volver a {arq.obrasLabel.toLowerCase()}
             </Link>
             <ArqEditButton
               tenantId={development.tenantId}

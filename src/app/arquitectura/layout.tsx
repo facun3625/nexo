@@ -10,7 +10,7 @@ import { getStoreSettings } from "@/lib/settings";
 export default async function ArquitecturaLayout({ children }: { children: React.ReactNode }) {
   const tenant = await getCurrentTenant();
   if (!tenant) notFound();
-  const { showArquitectura } = await getStoreSettings(tenant.id);
+  const { showArquitectura, arq } = await getStoreSettings(tenant.id);
   if (showArquitectura) return children;
 
   const session = await auth();
@@ -20,7 +20,7 @@ export default async function ArquitecturaLayout({ children }: { children: React
   return (
     <>
       <div className="bg-amber-100 px-4 py-2 text-center text-sm font-medium text-amber-900">
-        Vista previa: la sección Arquitectura está oculta al público. Se activa desde Página web → Arquitectura.
+        Vista previa: la sección {arq.label} está oculta al público. Se activa desde Página web → {arq.label}.
       </div>
       {children}
     </>

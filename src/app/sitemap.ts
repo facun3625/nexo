@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentTenant } from "@/lib/tenant";
 import { absoluteUrl } from "@/lib/site-url";
 import { getStoreSettings } from "@/lib/settings";
+import { arqSections } from "@/lib/arquitectura";
 
 // Se arma en cada pedido: una propiedad recién publicada entra sola.
 export const dynamic = "force-dynamic";
@@ -27,9 +28,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const tenant = await getCurrentTenant();
   const now = new Date();
   // Con la sección Arquitectura oculta esas páginas dan 404: no se listan.
-  const showArq = tenant ? (await getStoreSettings(tenant.id)).showArquitectura : false;
+  // Equipo y Servicios se pueden apagar por separado (p. ej. si solo hay obras).
+  const store = tenant ? await getStoreSettings(tenant.id) : null;
+  const showArq = store?.showArquitectura ?? false;
+  const arqPages = new Set(store ? arqSections(store.arq).map((s) => s.href as string) : []);
   const pages: MetadataRoute.Sitemap = STATIC_PAGES.filter(
-    (p) => showArq || !p.path.startsWith("/arquitectura"),
+    (p) => !p.path.startsWith("/arquitectura") || (showArq && arqPages.has(p.path)),
   ).map((p) => ({
     url: absoluteUrl(p.path),
     lastModified: now,

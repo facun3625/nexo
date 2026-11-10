@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { mergeArqConfig, type ArqConfig } from "@/lib/arquitectura";
 import { prisma } from "@/lib/prisma";
 import { WHATSAPP_TEMPLATE_IDS, WHATSAPP_TEMPLATES, type WhatsappTemplates } from "@/lib/whatsapp-templates";
 
@@ -30,6 +31,8 @@ export type StoreSettings = {
   // desde Página web → Arquitectura. Apagada, no aparece en el menú ni en
   // el Inicio y sus páginas dan 404 al público.
   showArquitectura: boolean;
+  // Nombre de la sección, páginas visibles y bloque del Inicio.
+  arq: ArqConfig;
   // Hay obras publicadas Y la sección Arquitectura está visible.
   hasDevelopments: boolean;
   headerBgColor: string;
@@ -98,7 +101,16 @@ const SETTINGS_KEYS = [
   "store_footer_logo_height",
   "newsletter_signup",
   "arq_enabled",
+  "arq_config",
 ] as const;
+
+function parseArqConfig(value: string | undefined): ArqConfig {
+  try {
+    return mergeArqConfig(value ? JSON.parse(value) : null);
+  } catch {
+    return mergeArqConfig(null);
+  }
+}
 
 export const getStoreSettings = cache(
   async (tenantId: string): Promise<StoreSettings> => {
@@ -133,6 +145,7 @@ export const getStoreSettings = cache(
       template: map.store_template || DEFAULT_STORE_TEMPLATE,
       hasServices: false,
       showArquitectura: map.arq_enabled === "true",
+      arq: parseArqConfig(map.arq_config),
       hasDevelopments: map.arq_enabled === "true" && developmentCount > 0,
       headerBgColor: map.store_header_bg_color || DEFAULT_HEADER_BG_COLOR,
       menuBgColor: map.store_menu_bg_color || DEFAULT_MENU_BG_COLOR,

@@ -24,7 +24,7 @@ export function ArquitecturaVisibility({ enabled }: { enabled: boolean }) {
         toast.error(result.error);
         return;
       }
-      toast.success(next ? "Arquitectura visible en el sitio" : "Arquitectura oculta");
+      toast.success(next ? "Sección visible en el sitio" : "Sección oculta");
       router.refresh();
     });
   }

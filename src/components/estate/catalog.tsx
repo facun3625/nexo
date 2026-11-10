@@ -134,11 +134,11 @@ export async function EstateCatalog({ tenantId }: { tenantId: string }) {
               style={{ backgroundColor: settings.buttonColor, color: contrastText(settings.buttonColor) }}
             >
               <div className="max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[.25em] opacity-65">Arquitectura</p>
-                <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl">Obras del estudio.</h2>
-                <p className="mt-4 max-w-xl opacity-75">Proyectos diseñados y dirigidos por nuestro estudio de arquitectura.</p>
+                <p className="text-xs font-semibold uppercase tracking-[.25em] opacity-65">{settings.arq.label}</p>
+                <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl">{settings.arq.homeTitle || settings.arq.obrasLabel}</h2>
+                {settings.arq.homeText && <p className="mt-4 max-w-xl opacity-75">{settings.arq.homeText}</p>}
               </div>
-              <span className="mt-8 inline-flex items-center gap-2 border-b border-current pb-1 font-semibold lg:mt-0">Explorar obras <ArrowRight className="size-4" /></span>
+              <span className="mt-8 inline-flex items-center gap-2 border-b border-current pb-1 font-semibold lg:mt-0">Ver {settings.arq.obrasLabel.toLowerCase()} <ArrowRight className="size-4" /></span>
             </Link>
           )}
         </main>
@@ -189,11 +189,11 @@ export async function EstateCatalog({ tenantId }: { tenantId: string }) {
             {settings.hasDevelopments && (
               <Link href="/arquitectura/obras" className="group mt-20 flex flex-col justify-between gap-8 border-y border-neutral-900 py-10 sm:flex-row sm:items-end">
                 <div>
-                  <p className="text-xs uppercase tracking-[.25em] text-neutral-500">Arquitectura</p>
-                  <h2 className="mt-3 text-3xl font-medium tracking-tight sm:text-5xl">Nuestras obras</h2>
-                  <p className="mt-4 text-neutral-500">Proyectos diseñados y dirigidos por nuestro estudio.</p>
+                  <p className="text-xs uppercase tracking-[.25em] text-neutral-500">{settings.arq.label}</p>
+                  <h2 className="mt-3 text-3xl font-medium tracking-tight sm:text-5xl">{settings.arq.homeTitle || settings.arq.obrasLabel}</h2>
+                  {settings.arq.homeText && <p className="mt-4 text-neutral-500">{settings.arq.homeText}</p>}
                 </div>
-                <span className="inline-flex items-center gap-3 text-sm font-medium">Ver obras <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></span>
+                <span className="inline-flex items-center gap-3 text-sm font-medium">Ver {settings.arq.obrasLabel.toLowerCase()} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></span>
               </Link>
             )}
           </section>
@@ -318,17 +318,19 @@ export async function EstateCatalog({ tenantId }: { tenantId: string }) {
             >
               <div className="max-w-2xl">
                 <p className="text-xs font-semibold uppercase tracking-[.2em] opacity-70">
-                  Arquitectura
+                  {settings.arq.label}
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-                  Conocé nuestras obras
+                  {settings.arq.homeTitle || settings.arq.obrasLabel}
                 </h2>
-                <p className="mt-2 text-sm leading-relaxed opacity-80 sm:text-base">
-                  Proyectos diseñados y dirigidos por nuestro estudio de arquitectura.
-                </p>
+                {settings.arq.homeText && (
+                  <p className="mt-2 text-sm leading-relaxed opacity-80 sm:text-base">
+                    {settings.arq.homeText}
+                  </p>
+                )}
               </div>
               <span className="inline-flex w-fit shrink-0 items-center gap-2 rounded-full border border-current/30 px-5 py-3 text-sm font-semibold transition-colors group-hover:bg-white/15">
-                Ver obras
+                Ver {settings.arq.obrasLabel.toLowerCase()}
                 <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
               </span>
             </Link>
