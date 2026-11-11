@@ -4,6 +4,9 @@
 set -e
 
 echo "== git pull =="
+# El build en .next-build agrega sus rutas de tipos a tsconfig.json; ese
+# cambio local haría fallar el pull, así que se descarta antes.
+git checkout -- tsconfig.json 2>/dev/null || true
 git pull origin main
 
 echo "== npm install =="
