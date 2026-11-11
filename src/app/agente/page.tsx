@@ -18,7 +18,7 @@ export default async function AgentPage({ searchParams }: { searchParams: Promis
   const { agent, tenant, permissions } = await requireAgent();
   const search = await searchParams;
   const requestedChannel = parseInquiryChannel(search.channel);
-  const firstAdminSection = AGENT_MENU_SECTIONS.find((section) => permissions[section.key] !== "NONE");
+  const firstAdminSection = AGENT_MENU_SECTIONS.find((section) => !("hidden" in section) && permissions[section.key] !== "NONE");
   const availableChannels = Object.keys(inquiryChannels).filter(
     (key) => permissions[permissionForChannel(key as keyof typeof inquiryChannels)] !== "NONE",
   ) as (keyof typeof inquiryChannels)[];

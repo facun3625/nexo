@@ -88,7 +88,7 @@ export function AgentSectionPermissions({
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {AGENT_MENU_SECTIONS.map((section) => (
+        {AGENT_MENU_SECTIONS.filter((section) => !("hidden" in section)).map((section) => (
           <SectionPermission
             key={section.key}
             section={section}

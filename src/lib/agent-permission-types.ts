@@ -12,8 +12,10 @@ export const AGENT_MENU_SECTIONS = [
   { key: "qrVisits", title: "Aperturas de QR", description: "Personas que escanearon el QR de una propiedad.", href: "/admin/gestion/aperturas-qr" },
   { key: "operations", title: "Operaciones", description: "Negociaciones, reservas y cierres", href: "/admin/gestion/operaciones" },
   { key: "appraisals", title: "Tasaciones", description: "Solicitudes y valoraciones", href: "/admin/gestion/tasaciones" },
-  { key: "contracts", title: "Contratos", description: "Contratos y documentación", href: "/admin/gestion/contratos" },
-  { key: "collections", title: "Cobranzas", description: "Cargos, pagos y recibos", href: "/admin/gestion/cobranzas" },
+  // Contratos y Cobranzas no se usan en Nexo: fuera del menú y de los
+  // permisos de agentes (las páginas y los datos siguen existiendo).
+  { key: "contracts", title: "Contratos", description: "Contratos y documentación", href: "/admin/gestion/contratos", hidden: true },
+  { key: "collections", title: "Cobranzas", description: "Cargos, pagos y recibos", href: "/admin/gestion/cobranzas", hidden: true },
   { key: "developments", title: "Obras", description: "Obras del estudio de arquitectura", href: "/admin/gestion/emprendimientos" },
   { key: "developmentInquiries", title: "Consultas de obras", description: "Consultas recibidas por obras", href: "/admin/gestion/consultas-emprendimientos" },
   { key: "services", title: "Servicios", description: "Servicios publicados", href: "/admin/servicios" },

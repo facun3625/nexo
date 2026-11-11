@@ -9,7 +9,6 @@ import {
   QrCodeIcon,
   LayoutDashboardIcon,
   ClipboardListIcon,
-  CreditCardIcon,
   SettingsIcon,
   StoreIcon,
   UsersIcon,
@@ -101,18 +100,6 @@ const sections: Section[] = [
     href: "/admin/gestion/tasaciones",
     label: "Tasaciones",
     icon: StoreIcon,
-    group: "Gestión Inmobiliaria",
-  },
-  {
-    href: "/admin/gestion/contratos",
-    label: "Contratos",
-    icon: ClipboardListIcon,
-    group: "Gestión Inmobiliaria",
-  },
-  {
-    href: "/admin/gestion/cobranzas",
-    label: "Cobranzas",
-    icon: CreditCardIcon,
     group: "Gestión Inmobiliaria",
   },
   {

@@ -4,25 +4,13 @@ import {
   Building2,
   CalendarDays,
   Users,
-  FileText,
   Plus,
 } from "lucide-react";
 import { requireTenantAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
-import { money, dateLabel, argentinaDayStart } from "@/lib/estate/modules";
-import { Prisma } from "@/generated/prisma/client";
 export default async function AdminPage() {
   const { tenant } = await requireTenantAdmin();
-  const now = new Date();
-  const monthAhead = new Date(now.getTime() + 30 * 86400000);
-  const [
-    properties,
-    contacts,
-    inquiries,
-    contracts,
-    expiring,
-    charges,
-  ] = await Promise.all([
+  const [properties, contacts, inquiries] = await Promise.all([
     prisma.estateProperty.count({ where: { tenantId: tenant.id } }),
     prisma.estateContact.count({
       where: { tenantId: tenant.id, archived: false },
@@ -30,39 +18,7 @@ export default async function AdminPage() {
     prisma.estateInquiry.count({
       where: { tenantId: tenant.id, status: "NEW" },
     }),
-    prisma.estateContract.count({
-      where: { tenantId: tenant.id, status: "ACTIVE" },
-    }),
-    prisma.estateContract.findMany({
-      where: {
-        tenantId: tenant.id,
-        status: "ACTIVE",
-        endsAt: { gte: now, lte: monthAhead },
-      },
-      include: { property: true },
-      orderBy: { endsAt: "asc" },
-      take: 5,
-    }),
-    prisma.estateCharge.findMany({
-      where: {
-        tenantId: tenant.id,
-        contractId: { not: null },
-        cancelled: false,
-        dueAt: { lt: argentinaDayStart(now) },
-      },
-      include: { receipts: true },
-    }),
   ]);
-  const balances: Record<string, Prisma.Decimal> = {};
-  for (const c of charges) {
-    const balance = c.amount.minus(
-      c.receipts.reduce((a, r) => a.plus(r.amount), new Prisma.Decimal(0)),
-    );
-    if (balance.gt(0))
-      balances[c.currency] = (
-        balances[c.currency] ?? new Prisma.Decimal(0)
-      ).plus(balance);
-  }
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       <header className="flex flex-wrap justify-between gap-4">
@@ -74,7 +30,7 @@ export default async function AdminPage() {
             Resumen de actividad
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Cartera, relaciones y administración al día.
+            Cartera, contactos y consultas al día.
           </p>
         </div>
         <Link
@@ -85,7 +41,7 @@ export default async function AdminPage() {
           Nueva propiedad
         </Link>
       </header>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         {[
           {
             label: "Propiedades",
@@ -105,12 +61,6 @@ export default async function AdminPage() {
             icon: CalendarDays,
             href: "consultas",
           },
-          {
-            label: "Contratos activos",
-            value: contracts,
-            icon: FileText,
-            href: "contratos",
-          },
         ].map((c) => (
           <Link
             key={c.href}
@@ -125,40 +75,6 @@ export default async function AdminPage() {
             <p className="mt-1 text-sm text-muted-foreground">{c.label}</p>
           </Link>
         ))}
-      </div>
-      <div className="grid gap-6">
-        <section className="rounded-2xl border bg-card p-6">
-          <h2 className="text-lg font-semibold">Vencimientos y cobranzas</h2>
-          <div className="my-5 space-y-3">
-            {Object.entries(balances).map(([currency, balance]) => (
-              <p
-                key={currency}
-                className="rounded-xl bg-amber-500/10 p-4 text-sm"
-              >
-                Saldo vencido: <strong>{money(balance, currency)}</strong>
-              </p>
-            ))}
-            {!Object.keys(balances).length && (
-              <p className="text-sm text-muted-foreground">
-                Sin obligaciones vencidas pendientes.
-              </p>
-            )}
-            {expiring.map((c) => (
-              <p key={c.id} className="border-t pt-3 text-sm">
-                {c.reference} · {c.property.title}
-                <span className="block text-muted-foreground">
-                  Contrato vence el {dateLabel(c.endsAt)}
-                </span>
-              </p>
-            ))}
-          </div>
-          <Link
-            href="/admin/gestion/cobranzas"
-            className="text-sm text-primary"
-          >
-            Ver cuenta corriente →
-          </Link>
-        </section>
       </div>
     </div>
   );
